@@ -16,6 +16,7 @@ class Theme:
             LAYER_GROUND_EARTH: (2, 7),
             LAYER_GROUND_SEA: (5, 7),
         }
+
     # Getters and setters
     @property
     def tileWidth(self) -> int:
