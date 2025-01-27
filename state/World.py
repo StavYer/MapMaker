@@ -6,7 +6,10 @@ class World:
         # Value of every cell of the world. Should be immutable.
         # A 2d matrix - each row has width columns (initialized to 0)
         # and we have height rows
-        self.__cells = [[0] * input_width] * input_height
+        self.__cells = []
+        for y in range(input_height):
+            row = [0] * input_width
+            self.__cells.append(row)
 
     # Getter properties
     @property
