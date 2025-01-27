@@ -24,11 +24,11 @@ class World:
         assert 0 <= input_x < self.__width, f"invalid cell x coordinate: {input_x}"
         assert 0 <= input_y < self.__height, f"invalid cell y coordinate: {input_y}"
 
-        return self.__cells[input_x][input_y]
+        return self.__cells[input_y][input_x]
 
     def set_cell_value(self, input_x : int, input_y : int, value : int) -> None:
         # Same here
         assert 0 <= input_x < self.__width, f"invalid cell x coordinate: {input_x}"
         assert 0 <= input_y < self.__height, f"invalid cell y coordinate: {input_y}"
         assert 0 <= value <= 1 and type(value) == int, f"invalid cell value: {value}"
-        self.__cells[input_x][input_y] = value
+        self.__cells[input_y][input_x] = value
