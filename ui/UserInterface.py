@@ -13,10 +13,8 @@ from ui.mode import GameMode
 
 class UserInterface:
     def __init__(self, input_theme : Theme):
-        self.__world = input_world
-
-        pygame.init()
         # Create a resizable window of size 1920 x 1080, with faster rendering on screen
+        pygame.init()
         self.__window = pygame.display.set_mode((1024, 768), HWSURFACE | DOUBLEBUF | RESIZABLE)
         # Set game caption and icon
         pygame.display.set_caption("TacticsGame")
