@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from pygame import Surface
 
-from ui import Theme
+from ui import Theme, MouseButtons, MouseWheel
 
 
 class GameMode(ABC):
@@ -24,3 +24,23 @@ class GameMode(ABC):
     @abstractmethod
     def render(self, surface: Surface):
         raise NotImplementedError()
+
+    # Mouse handling
+
+    def mouseEnter(self, input_mouseX: int, input_mouseY: int, input_buttons: MouseButtons):
+        return False
+
+    def mouseLeave(self):
+        return False
+
+    def mouseButtonDown(self, input_mouseX: int, input_mouseY: int, input_buttons: MouseButtons):
+        return False
+
+    def mouseButtonUp(self, input_mouseX: int, input_mouseY: int, input_buttons: MouseButtons):
+        return False
+
+    def mouseWheel(self, input_mouseX: int, input_mouseY: int, input_buttons: MouseButtons, wheel: MouseWheel):
+        return False
+
+    def mouseMove(self, input_mouseX: int, input_mouseY: int, input_buttons: MouseButtons):
+        return False

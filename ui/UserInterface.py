@@ -27,6 +27,7 @@ class UserInterface:
         }
         self.__clock = pygame.time.Clock()
 
+
     # main game loop
     def run(self):
         running = True
