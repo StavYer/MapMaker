@@ -1,6 +1,6 @@
 class World:
     def __init__(self, input_width : int, input_height : int):
-        # size of are world. Should be immutable.
+        # size of our world. Should be immutable.
         self.__width = input_width
         self.__height = input_height
         # Value of every cell of the world. Should be immutable.
