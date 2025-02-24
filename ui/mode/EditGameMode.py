@@ -13,7 +13,7 @@ from ui.mode.GameMode import GameMode
 class EditGameMode(GameMode):
 
     def __init__(self, i_theme: Theme, i_world: World):
-        super().__init__(theme)
+        super().__init__(i_theme)
         self.__world = i_world
         self.__mouseButtonDown = False # True if player clicked inside world
 
@@ -24,24 +24,24 @@ class EditGameMode(GameMode):
         pass
 
     def render(self, i_surface: Surface):
-        theme = self.theme\
+        theme = self.theme
         tileWidth = theme.tileWidth
         tileHeight = theme.tileHeight
         tiles = theme.tiles
         tileset = theme.tileset
 
         # loop through every part of the world grid
-            for y in range(self.__world.height):
-                for x in range(self.__world.width):
-                    value = self.__world.get_cell_value(x, y)
-                    tile = tiles[value] # lookup tile coordinates in the tileset
-                    # Define the rectangle (in the tileset) to extract the tile's graphic - portion to copy
-                    tileRect = Rect(
-                        tile[0] * tileWidth, tile[1] * tileHeight,
-                        tileWidth, tileHeight
-                    )
-                    tileCoordinates = (x * tileWidth, y * tileHeight) # pos on render to draw this tile
-                    renderSurface.blit(self.__tileset, tileCoordinates, tileRect) # draw tile onto render surface
+        for y in range(self.__world.height):
+            for x in range(self.__world.width):
+                value = self.__world.get_cell_value(x, y)
+                tile = tiles[value] # lookup tile coordinates in the tileset
+                # Define the rectangle (in the tileset) to extract the tile's graphic - portion to copy
+                tileRect = Rect(
+                    tile[0] * tileWidth, tile[1] * tileHeight,
+                    tileWidth, tileHeight
+                )
+                tileCoordinates = (x * tileWidth, y * tileHeight) # pos on render to draw this tile
+                i_surface.blit(tileset, tileCoordinates, tileRect) # draw tile onto render surface
 
     # Mouse handling
 

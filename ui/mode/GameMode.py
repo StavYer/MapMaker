@@ -2,7 +2,7 @@
 GameMode.py, an abstract class to handle the high-level logics of rendering.
 """
 
-from abc import abc, abstractmethod
+from abc import ABC, abstractmethod
 
 from pygame.surface import Surface
 
@@ -12,7 +12,7 @@ from ui.Theme import Theme
 
 class GameMode(ABC):
 
-    def __init__(self, i_theme: Theme)
+    def __init__(self, i_theme: Theme):
         self.__theme = i_theme
 
     @property

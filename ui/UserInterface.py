@@ -35,7 +35,7 @@ class UserInterface:
         # Other
         self.__gameMode : Optional[GameMode] = None
         self.__running = True
-        self.__clock = pygame.time.clock() 
+        self.__clock = pygame.time.Clock() 
 
     @property
     def theme(self) -> Theme:
@@ -82,7 +82,7 @@ class UserInterface:
             elif i_event.type == pygame.MOUSEBUTTONUP:
                 self.__gameMode.mouseButtonUp(mouseX, mouseY, buttons)
 
-            elif event.type == pygame.MOUSEWHEEL:
+            elif i_event.type == pygame.MOUSEWHEEL:
                 wheel = MouseWheel(i_event.x, i_event.y, i_event.flipped, i_event.which)
                 self.__gameMode.mouseWheel(mouseX, mouseY, buttons, wheel)
 
@@ -96,18 +96,18 @@ class UserInterface:
 
     def processInput(self):
         """Handles all input events from the user."""
-            for event in pygame.event.get():
+        for event in pygame.event.get():
                 if event.type == pygame.QUIT:  # First, if user wants to quit
-                    running = False
+                    self.__running = False
                     break
 
                 elif event.type == pygame.KEYDOWN:  # Else, if user pressed keyboard
                     # User wants to quit game
                     if event.key == pygame.K_ESCAPE:
-                        running = False
+                        self.__running = False
                         break
 
-                elif event.type = pygame.ACTIVEEVENT:
+                elif event.type == pygame.ACTIVEEVENT:
                     # Handle focus changes
                     if event.state & pygame.APPMOUSEFOCUS == pygame.APPMOUSEFOCUS:
                         # If the mouse focus state has changed, process mouse events
@@ -149,7 +149,7 @@ class UserInterface:
             rescaledSurface = pygame.transform.scale(renderSurface, (rescaledSurfaceWidth, rescaledSurfaceHeight))
             self.__rescaledScaleX = rescaledSurface.get_width() / renderSurface.get_width()
             self.__rescaledScaleY = rescaledSurface.get_height() / renderSurface.get_height()
-            self.__window.blit(rescaledSurface, (rescaledSurfaceX, rescaledSurfaceY))
+            self.__window.blit(rescaledSurface, (self.__rescaledX, self.__rescaledY))
 
     # main game loop
     def run(self):
