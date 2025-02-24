@@ -1,3 +1,7 @@
+"""
+GameMode.py, an abstract class to handle the high-level logics of rendering.
+"""
+
 from abc import abc, abstractmethod
 
 from pygame.surface import Surface
