@@ -163,13 +163,7 @@ class UserInterface:
             self.update()
             # Render
             self.render()
-            
 
-    
-
-            
-
-           
             pygame.display.update()
             self.__clock.tick(30)
 
