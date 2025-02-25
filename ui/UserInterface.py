@@ -24,7 +24,7 @@ class UserInterface:
         self.__theme = input_theme
         self.__rescaledX = 0    # Horizontal offset of the rescaled game within the window.
         self.__rescaledY = 0    # Vertical offset of the rescaled game within the window.
-        self.__rescaledScaleX = 1.0    # Horizontal scaling factor of the rescaled game.
+        self.__rescaledScaleX = 1.0    # Horizontal scaling factor applied to the rendered surface.
         self.__rescaledScaleY = 1.0    # Vertical scaling factor applied to the rendered surface.
         self.__renderWidth = self.__window.get_width()
         self.__renderHeight = self.__window.get_height()
