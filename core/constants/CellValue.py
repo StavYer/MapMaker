@@ -2,8 +2,8 @@ from enum import IntEnum
 
 class CellValue(IntEnum):
     NONE = 0
-    LAYER_GROUND_SEA = 101
-    LAYER_GROUND_EARTH = 102
+    GROUND_SEA = 101
+    GROUND_EARTH = 102
 
     IMPASSABLE_RIVER = 201
     IMPASSABLE_POND = 202
