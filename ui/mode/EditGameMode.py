@@ -19,8 +19,7 @@ class EditGameMode(GameMode):
         self.__world = i_world
         self.__mouseButtonDown = False # True if player clicked inside world
         self.__layers = [
-            LayerComponent(i_theme, i_world.getLayer(name), name)
-            for name in i_world.layerNames
+            LayerComponent(i_theme, i_world.getLayer(name), name) for name in i_world.layerNames
         ]
 
         self.__font = i_theme.getFont("default")

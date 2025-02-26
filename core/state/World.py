@@ -35,7 +35,6 @@ class World:
         return self.__layers["objects"]
 
     # Getter for a single layer
-    @property
     def getLayer(self, name: str) -> Layer:
         if name not in self.__layers:
             raise ValueError(f"Layer {name} not found")

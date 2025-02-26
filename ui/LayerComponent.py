@@ -11,7 +11,7 @@ from typing import Tuple, Optional
 
 from core.constants import CellValue
 from core.state import World, Layer
-from ui.theme.Theme import Theme
+from ui.Theme import Theme
 
 
 class LayerComponent:
