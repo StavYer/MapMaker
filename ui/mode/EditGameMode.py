@@ -19,11 +19,11 @@ class EditGameMode(GameMode):
         self.__world = i_world
         self.__mouseButtonDown = False # True if player clicked inside world
         self.__layers = [
-            LayerComponent(i_theme, i_world.getLayer(name), name) for name in i_world.layerNames
+            LayerComponent(i_theme, i_world, name) for name in i_world.layerNames
         ]
 
         self.__font = i_theme.getFont("default")
-        self.__brushLayer = "impassable"
+        self.__brushLayer = "ground"
 
     def processInput(self):
         pass
@@ -60,8 +60,9 @@ class EditGameMode(GameMode):
         """
         Convert the mouse coordinates from pixels to cells.
         """
-        cellX = i_mouseX // self.theme.tileWidth
-        cellY = i_mouseY // self.theme.tileHeight
+        tileWidth, tileHeight = self.theme.getTileset("ground").tileSize
+        cellX = i_mouseX // tileWidth
+        cellY = i_mouseY // tileHeight
 
         # If out of render window
         if not (0 <= cellX < self.__world.width) or not (0 <= cellY < self.__world.height):
@@ -74,16 +75,16 @@ class EditGameMode(GameMode):
         layer = self.__world.getLayer(self.__brushLayer)
         # update cell based on mouse button (left or right)
         if buttons.button1:
-            if layer.getValue(i_cellX, i_cellY) != CellValue.NONE:
+            if layer.get_cell_value(i_cellX, i_cellY) != CellValue.NONE:
                 return
 
             minValue = CellValueRanges[self.__brushLayer][0]
             maxValue = CellValueRanges[self.__brushLayer][1]
             value = random.randint(minValue, maxValue - 1)
-            layer.setValue(i_cellX, i_cellY, CellValue(value))
+            layer.set_cell_value(i_cellX, i_cellY, CellValue(value))
 
         elif buttons.button3:
-            layer.setValue(i_cellX, i_cellY, CellValue.NONE)
+            layer.set_cell_value(i_cellX, i_cellY, CellValue.GROUND_SEA)
     def mouseButtonDown(self, i_mouseX: int, i_mouseY: int, buttons: MouseButtons):
         cellCoordinates = self.__computeCellCoordinates(i_mouseX, i_mouseY)
 

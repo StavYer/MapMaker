@@ -17,8 +17,8 @@ from ui.Theme import Theme
 class LayerComponent:
     def __init__(self, i_theme: Theme, i_world: World, i_name: str):
         # Retrieve the layer and its matching tileset using the given name.
-        self.__layer = i_world.getLayer(name)
-        self.__tileset = theme.getTileset(name)
+        self.__layer = i_world.getLayer(i_name)
+        self.__tileset = i_theme.getTileset(i_name)
 
     def render(self, i_surface: Surface):
         # Create a temporary transparent surface matching the target surface size.
@@ -32,7 +32,7 @@ class LayerComponent:
         # Iterate over each cell in the layer grid.
         for y in range(self.__layer.height):
             for x in range(self.__layer.width):
-                value = self.__layer[x, y]
+                value = self.__layer.get_cell_value(x, y)
                 # Skip empty cells.
                 if value == CellValue.NONE:
                     continue

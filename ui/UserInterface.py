@@ -83,7 +83,7 @@ class UserInterface:
                 self.__gameMode.mouseButtonUp(mouseX, mouseY, buttons)
 
             elif i_event.type == pygame.MOUSEWHEEL:
-                wheel = MouseWheel(i_event.x, i_event.y, i_event.flipped, i_event.which)
+                wheel = MouseWheel(i_event.x, i_event.y, i_event.flipped)
                 self.__gameMode.mouseWheel(mouseX, mouseY, buttons, wheel)
 
             elif i_event.type == pygame.MOUSEMOTION:
