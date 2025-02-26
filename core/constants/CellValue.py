@@ -18,7 +18,7 @@ class CellValue(IntEnum):
     OBJECTS_ROAD_DIRT = 307
     OBJECTS_ROAD_STONE = 308
     OBJECTS_CAMP = 309
-    OBJECTS_FRAM = 310
+    OBJECTS_FARM = 310
 
 CellValueRanges = {
     "ground": (101, 103),
