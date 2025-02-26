@@ -1,13 +1,15 @@
+import random
 from typing import Tuple, Optional
 
-from pygame.rect import Rect
+import pygame
 from pygame.surface import Surface
 
-from state import World
-from state.constants import LAYER_GROUND_EARTH, LAYER_GROUND_SEA
-from ui.MouseButtons import MouseButtons
-from ui.Theme import Theme
-from ui.mode.GameMode import GameMode
+from core.constants import CellValue, CellValueRanges
+from core.state import World
+from ..LayerComponent import LayerComponent
+from ..MouseButtons import MouseButtons
+from ..Theme import Theme
+from .GameMode import GameMode
 
 
 class EditGameMode(GameMode):
@@ -16,6 +18,13 @@ class EditGameMode(GameMode):
         super().__init__(i_theme)
         self.__world = i_world
         self.__mouseButtonDown = False # True if player clicked inside world
+        self.__layers = [
+            LayerComponent(i_theme, i_world.getLayer(name), name)
+            for name in i_world.layerNames
+        ]
+
+        self.__font = i_theme.getFont("default")
+        self.__brushLayer = "impassable"
 
     def processInput(self):
         pass
@@ -24,24 +33,26 @@ class EditGameMode(GameMode):
         pass
 
     def render(self, i_surface: Surface):
-        theme = self.theme
-        tileWidth = theme.tileWidth
-        tileHeight = theme.tileHeight
-        tiles = theme.tiles
-        tileset = theme.tileset
+        # Render layers
+        for layer in self.__layers:
+            layer.render(i_surface)
 
-        # loop through every part of the world grid
-        for y in range(self.__world.height):
-            for x in range(self.__world.width):
-                value = self.__world.get_cell_value(x, y)
-                tile = tiles[value] # lookup tile coordinates in the tileset
-                # Define the rectangle (in the tileset) to extract the tile's graphic - portion to copy
-                tileRect = Rect(
-                    tile[0] * tileWidth, tile[1] * tileHeight,
-                    tileWidth, tileHeight
-                )
-                tileCoordinates = (x * tileWidth, y * tileHeight) # pos on render to draw this tile
-                i_surface.blit(tileset, tileCoordinates, tileRect) # draw tile onto render surface
+        # Draw text on surface
+        color = self.theme.getFontColor("default")
+        textSurfaces = [
+            self.__font.render(message, False, color)
+            for message in [
+                f"Current brush: {self.__brushLayer}",
+                "Left click: add",
+                "right click: remove",
+                "F1: Select 'impassable' layer",
+                "F2: Select 'objects' layer"
+            ]
+        ]
+        y = i_surface.get_height()
+        for textSurface in reversed(textSurfaces):
+            y -= textSurface.get_height() + 1
+            i_surface.blit(textSurface, (0, y))
 
     # Mouse handling
 
@@ -60,14 +71,20 @@ class EditGameMode(GameMode):
         return cellX, cellY
 
     def __updateCell(self, i_cellX: int, i_cellY: int, buttons: MouseButtons):
-
+        
+        layer = self.__world.getLayer(self.__brushLayer)
         # update cell based on mouse button (left or right)
         if buttons.button1:
-            self.__world.set_cell_value(i_cellX, i_cellY, LAYER_GROUND_EARTH)
+            if layer.getValue(i_cellX, i_cellY) != CellValue.NONE:
+                return
+
+            minValue = CellValueRanges[self.__brushLayer][0]
+            maxValue = CellValueRanges[self.__brushLayer][1]
+            value = random.randint(minValue, maxValue - 1)
+            layer.setValue(i_cellX, i_cellY, CellValue(value))
 
         elif buttons.button3:
-            self.__world.set_cell_value(i_cellX, i_cellY, LAYER_GROUND_SEA)
-
+            layer.setValue(i_cellX, i_cellY, CellValue.NONE)
     def mouseButtonDown(self, i_mouseX: int, i_mouseY: int, buttons: MouseButtons):
         cellCoordinates = self.__computeCellCoordinates(i_mouseX, i_mouseY)
 

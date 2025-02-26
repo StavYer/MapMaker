@@ -1,14 +1,15 @@
-from state import World
-from state.constants import LAYER_GROUND_EARTH
+from core.state import World
+from core.constants import CellValue
 from ui import UserInterface, Theme
 
 # Create a basic game state
 from ui.mode import EditGameMode
 
-world = World(16, 10)
-for y in range(3, 7):
-    for x in range(4, 12):
-        world.set_cell_value(x, y, LAYER_GROUND_EARTH)
+world = World(20, 15)
+ground = world.ground
+for y in range(0, world.height):
+    for x in range(0, world.width):
+        world.set_cell_value(x, y, CellValue.GROUND_EARTH)
 
 # Create a user interface object and run it
 theme = Theme()
