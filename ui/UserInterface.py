@@ -48,6 +48,19 @@ class UserInterface:
         self.__renderWidth = i_renderWidth
         self.__renderHeight = i_renderHeight
     
+    def __processKeyEvent(self, i_event):
+        # Check there is a game mode, otherwise there's no event to notify
+        if self.__gameMode is None:
+            return
+
+        # If key is pressed, notify game mode
+        if i_event.type == pygame.KEYDOWN:
+            self.__gameMode.keyDown(i_event.key)
+
+        # If key is released, notify game mode
+        elif i_event.type == pygame.KEYUP:
+            self.__gameMode.keyUp(i_event.key)
+    
     def __processMouseEvent(self, i_event):
         # Check there is a game mode, otherwise there's no event to notify
         if self.__gameMode is None:
@@ -101,11 +114,15 @@ class UserInterface:
                     self.__running = False
                     break
 
-                elif event.type == pygame.KEYDOWN:  # Else, if user pressed keyboard
+                elif event.type == pygame.KEYDOWN \
+                    or event.type == pygame.KEYUP:  # Else, handle keyboard events
+
                     # User wants to quit game
                     if event.key == pygame.K_ESCAPE:
                         self.__running = False
                         break
+                    
+                    self.__processKeyEvent(event)
 
                 elif event.type == pygame.ACTIVEEVENT:
                     # Handle focus changes

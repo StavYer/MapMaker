@@ -31,6 +31,14 @@ class GameMode(ABC):
     def render(self, i_surface: Surface):
         raise NotImplementedError()
 
+    # Keyboard handling
+    
+    def keyDown(self, i_key: int):
+        pass
+
+    def keyUp(self, i_key: int):
+        pass
+
     # Mouse handling
 
     # When mouse enters render area
