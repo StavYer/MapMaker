@@ -6,8 +6,10 @@ from abc import ABC, abstractmethod
 if TYPE_CHECKING:
     from .Logic import Logic
 
+# Set to ensure that the priority values don't intersect with others
 WORLD_PRIORITY = 100
 
+# The maximum size of the world
 WORLD_MAX_WIDTH = 4096
 WORLD_MAX_HEIGHT = 4096
 
