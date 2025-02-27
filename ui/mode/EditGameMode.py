@@ -41,17 +41,29 @@ class EditGameMode(GameMode):
         textSurfaces = [
             self.__font.render(message, False, color)
             for message in [
-                f"Current brush: {self.__brushLayer}",
+               f"Current brush: {self.__brushLayer}",
                 "Left click: add",
+                "middle click: fill",
                 "right click: remove",
-                "F1: Select 'impassable' layer",
-                "F2: Select 'objects' layer"
+                "F1/F2/F3: Select 'ground'/'impassable'/'objects' layer"
             ]
         ]
         y = i_surface.get_height()
         for textSurface in reversed(textSurfaces):
             y -= textSurface.get_height() + 1
             i_surface.blit(textSurface, (0, y))
+
+
+
+    # Keyboard handling
+    def keyDown(self, i_key: int):
+        if i_key == pygame.K_F1:
+            self.__brushLayer = "ground"
+        elif i_key == pygame.K_F2:
+            self.__brushLayer = "impassable"
+        elif i_key == pygame.K_F3:
+            self.__brushLayer = "objects"
+
 
     # Mouse handling
 
@@ -70,21 +82,27 @@ class EditGameMode(GameMode):
 
         return cellX, cellY
 
-    def __updateCell(self, i_cellX: int, i_cellY: int, buttons: MouseButtons):
+    def __updateCell(self, i_cellX: int, i_cellY: int, i_buttons: MouseButtons):
         
         layer = self.__world.getLayer(self.__brushLayer)
         # update cell based on mouse button (left or right)
-        if buttons.button1:
-            if layer.get_cell_value(i_cellX, i_cellY) != CellValue.NONE:
-                return
+        if i_buttons.button1:
+            if self.__brushLayer == "ground" and layer.get_cell_value(i_cellX, i_cellY) == CellValue.GROUND_SEA:
+                layer.set_cell_value(i_cellX, i_cellY, CellValue.GROUND_EARTH)
+            
+            elif self.__brushLayer != "ground":
+                minValue = CellValueRanges[self.__brushLayer][0]
+                maxValue = CellValueRanges[self.__brushLayer][1]
+                value = random.randint(minValue, maxValue - 1)
+                layer.set_cell_value(i_cellX, i_cellY, CellValue(value))
 
-            minValue = CellValueRanges[self.__brushLayer][0]
-            maxValue = CellValueRanges[self.__brushLayer][1]
-            value = random.randint(minValue, maxValue - 1)
-            layer.set_cell_value(i_cellX, i_cellY, CellValue(value))
+        elif i_buttons.button3:
+            if self.__brushLayer == "ground":
+                layer.set_cell_value(i_cellX, i_cellY, CellValue.GROUND_SEA)
+            
+            else:
+                layer.set_cell_value(i_cellX, i_cellY, CellValue.NONE)
 
-        elif buttons.button3:
-            layer.set_cell_value(i_cellX, i_cellY, CellValue.GROUND_SEA)
     def mouseButtonDown(self, i_mouseX: int, i_mouseY: int, buttons: MouseButtons):
         cellCoordinates = self.__computeCellCoordinates(i_mouseX, i_mouseY)
 
