@@ -45,10 +45,10 @@ class SetImpassableValueCommand(SetLayerValueCommand):
     def execute(self, i_logic: Logic):
         coords = self._coords
         value = self._value
-        world = i_logic.world
+        impassable = i_logic.world.impassable
         # Set the impassable cell value in the world
-        world.impassable.set_cell_value(coords[0], coords[1], value)
-        
+        impassable.set_cell_value(coords[0], coords[1], value)
+        impassable.notifyCellChanged(coords)
         # If fill is enabled, recursively add commands for adjacent cells
         if hasattr(self, '_fill') and self._fill:
             x, y = coords[0], coords[1]

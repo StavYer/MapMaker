@@ -12,6 +12,8 @@ from ..LayerComponent import LayerComponent
 from ..Mouse import Mouse
 from ..Theme import Theme
 from .GameMode import GameMode
+from ..LayerComponent import LayerComponent
+from ..CacheComponent import CacheComponent
 
 
 class EditGameMode(GameMode):
@@ -22,7 +24,7 @@ class EditGameMode(GameMode):
         self.__logic = Logic(i_world)
         self.__mouseButtonDown = False # True if player clicked inside world
         self.__layers = [
-            LayerComponent(i_theme, i_world, name) for name in i_world.layerNames
+            CacheComponent(LayerComponent(i_theme, i_world, name)) for name in i_world.layerNames
         ]
 
         self.__font = i_theme.getFont("default")
