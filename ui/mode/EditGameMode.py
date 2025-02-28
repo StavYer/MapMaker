@@ -8,12 +8,11 @@ from core.constants import CellValue, CellValueRanges
 from core.state import World
 from core.logic import Logic
 from tools.vector import vectorDivI
-from ..LayerComponent import LayerComponent
 from ..Mouse import Mouse
-from ..Theme import Theme
+from ..theme.Theme import Theme
 from .GameMode import GameMode
-from ..LayerComponent import LayerComponent
-from ..CacheComponent import CacheComponent
+from ..component.LayerComponent import LayerComponent
+from ..component.CacheComponent import CacheComponent
 
 
 class EditGameMode(GameMode):

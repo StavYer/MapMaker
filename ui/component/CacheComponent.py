@@ -2,13 +2,13 @@ import pygame
 from pygame.surface import Surface
 
 from .Component import Component
-
+from ui.theme.Theme import Theme
 
 class CacheComponent(Component):
     """A proxy component that caches the rendering of another component."""
     
     def __init__(self, i_component: Component):
-        super().__init__(component.theme)
+        super().__init__(i_component.theme)
         self.__component = i_component
         self.__surface = None
         

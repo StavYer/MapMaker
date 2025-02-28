@@ -7,7 +7,7 @@ from pygame.surface import Surface
 
 from ui.Mouse import Mouse
 from ui.MouseWheel import MouseWheel
-from ui.Theme import Theme
+from ui.theme.Theme import Theme
 from ui.mode import GameMode
 from tools.vector import vectorDivF
 
