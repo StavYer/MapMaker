@@ -70,13 +70,13 @@ class EditGameMode(GameMode):
     # Mouse handling
 
     
-    def __computeCellCoordinates(self, i_mouseX: int, i_mouseY: int) -> Optional[Tuple[int, int]]:
+    def __computeCellCoordinates(self, i_pixel: Tuple[int, int]) -> Optional[Tuple[int, int]]:
         """
         Convert the mouse coordinates from pixels to cells.
         """
-        tileWidth, tileHeight = self.theme.getTileset("ground").tileSize
-        cellX = i_mouseX // tileWidth
-        cellY = i_mouseY // tileHeight
+        tileWidth, tileHeight = self.theme.getTileset(self.__brushLayer).tileSize
+        cellX = i_pixel[0] // tileWidth
+        cellY = i_pixel[1] // tileHeight
 
         # If out of render window
         if not (0 <= cellX < self.__world.width) or not (0 <= cellY < self.__world.height):
@@ -84,7 +84,7 @@ class EditGameMode(GameMode):
 
         return cellX, cellY
 
-    def __updateCell(self, i_cellX: int, i_cellY: int, i_mouse : Mouse):
+    def __updateCell(self, cell: Tuple[int, int], i_mouse : Mouse):
         
         layer = self.__world.getLayer(self.__brushLayer)
         # update cell based on mouse button (left or right)
@@ -111,33 +111,31 @@ class EditGameMode(GameMode):
         
         # Get the appropriate set layer value command and add it to waiting commands.
         Command = self.__logic.getSetLayerValueCommand(self.__brushLayer)
-        command = Command((i_cellX, i_cellY), value)
+        command = Command(cell, value)
         self.__logic.addCommand(command)
         
 
 
-    def mouseButtonDown(self, i_mouseX: int, i_mouseY: int, i_mouse : Mouse):
-        cellCoordinates = self.__computeCellCoordinates(i_mouseX, i_mouseY)
+    def mouseButtonDown(self, i_mouse : Mouse):
+        cellCoordinates = self.__computeCellCoordinates(i_mouse.coords)
 
         # If none, means we are outside render window
         if cellCoordinates is None:
             return
 
-        cellX, cellY = cellCoordinates
         self.__mouseButtonDown = True
-        self.__updateCell(cellX, cellY, i_mouse)
+        self.__updateCell(cellCoordinates, i_mouse)
 
-    def mouseMove(self, i_mouseX: int, i_mouseY: int, i_mouse : Mouse):
+    def mouseMove(self, i_mouse : Mouse):
         if not self.__mouseButtonDown:
             return
 
-        cellCoordinates = self.__computeCellCoordinates(i_mouseX, i_mouseY)
+        cellCoordinates = self.__computeCellCoordinates(i_mouse.coords)
 
         if cellCoordinates is None:
             return
 
-        cellX, cellY = cellCoordinates
-        self.__updateCell(cellX, cellY, i_mouse)
+        self.__updateCell(cellCoordinates, i_mouse)
     
     def mouseButtonUp(self, i_mouseX: int, i_mouseY: int, i_mouse : Mouse):
         self.__mouseButtonDown = False

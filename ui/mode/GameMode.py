@@ -42,7 +42,7 @@ class GameMode(ABC):
     # Mouse handling
 
     # When mouse enters render area
-    def mouseEnter(self, i_mouseX: int, i_mouseY: int, i_buttons: MouseButtons):
+    def mouseEnter(self, i_mouse: Mouse):
         return False
 
     # When mouse leaves render area
@@ -50,17 +50,17 @@ class GameMode(ABC):
         return False
 
     # When mouse button is pressed
-    def mouseButtonDown(self, i_mouseX: int, i_mouseY: int, i_buttons: MouseButtons):
+    def mouseButtonDown(self, i_mouse: Mouse):
         return False
 
     # When mouse button is released
-    def mouseButtonUp(self, i_mouseX: int, i_mouseY: int, i_buttons: MouseButtons):
+    def mouseButtonUp(self, i_mouse: Mouse):
         return False
 
     # When mouse wheel is scrolled
-    def mouseWheel(self, i_mouseX: int, i_mouseY: int, i_buttons: MouseButtons, i_wheel: MouseWheel):
+    def mouseWheel(self, i_mouse: Mouse, i_wheel: MouseWheel):
         return False
 
     # When mouse moves
-    def mouseMove(self, i_mouseX: int, i_mouseY: int, i_buttons: MouseButtons):
+    def mouseMove(self, i_mouse: Mouse):
         return False

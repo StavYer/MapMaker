@@ -5,7 +5,7 @@ from pygame import Rect
 from pygame.constants import HWSURFACE, DOUBLEBUF, RESIZABLE
 from pygame.surface import Surface
 
-from ui.MouseButtons import MouseButtons
+from ui.Mouse import Mouse
 from ui.MouseWheel import MouseWheel
 from ui.Theme import Theme
 from ui.mode import GameMode
@@ -79,7 +79,7 @@ class UserInterface:
         mouseY = int((mouseY - self.__rescaledY) / self.__rescaledScaleY)  # Convert screen Y to game world Y.
         # Get state of mouse buttons and store it
         pygameButtons = pygame.mouse.get_pressed(num_buttons=3)
-        buttons = MouseButtons(pygameButtons[0], pygameButtons[1], pygameButtons[2])
+        mouse = Mouse((mouseX, mouseY), pygameButtons)
 
         # If mouse is within the render window, notify the game mode appropriately
         if 0 <= mouseX < self.__renderWidth \
@@ -87,20 +87,20 @@ class UserInterface:
 
             if not self.__mouseFocus:
                 self.__mouseFocus = True
-                self.__gameMode.mouseEnter(mouseX, mouseY, buttons)
+                self.__gameMode.mouseEnter(mouse)
 
             if i_event.type == pygame.MOUSEBUTTONDOWN:
-                self.__gameMode.mouseButtonDown(mouseX, mouseY, buttons)
+                self.__gameMode.mouseButtonDown(mouse)
 
             elif i_event.type == pygame.MOUSEBUTTONUP:
-                self.__gameMode.mouseButtonUp(mouseX, mouseY, buttons)
+                self.__gameMode.mouseButtonUp(mouse)
 
             elif i_event.type == pygame.MOUSEWHEEL:
                 wheel = MouseWheel(i_event.x, i_event.y, i_event.flipped)
-                self.__gameMode.mouseWheel(mouseX, mouseY, buttons, wheel)
+                self.__gameMode.mouseWheel(mouse, wheel)
 
             elif i_event.type == pygame.MOUSEMOTION:
-                self.__gameMode.mouseMove(mouseX, mouseY, buttons)
+                self.__gameMode.mouseMove(mouse)
 
         # Otherwise, notify that it's outside the render window.
         elif self.__mouseFocus:
