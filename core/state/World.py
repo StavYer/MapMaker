@@ -49,3 +49,7 @@ class World:
     @property
     def layers(self) -> list[Layer]:
         return list(self.__layers.values())
+
+    def contains(self, coords: tuple[int, int]) -> bool:
+        """Check if coordinates are within the world boundaries."""
+        return 0 <= coords[0] < self.__width and 0 <= coords[1] < self.__height
