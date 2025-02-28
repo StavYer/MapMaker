@@ -7,6 +7,7 @@ from pygame.surface import Surface
 from core.constants import CellValue, CellValueRanges
 from core.state import World
 from core.logic import Logic
+from tools.vector import vectorDivI
 from ..LayerComponent import LayerComponent
 from ..Mouse import Mouse
 from ..Theme import Theme
@@ -74,15 +75,15 @@ class EditGameMode(GameMode):
         """
         Convert the mouse coordinates from pixels to cells.
         """
-        tileWidth, tileHeight = self.theme.getTileset(self.__brushLayer).tileSize
-        cellX = i_pixel[0] // tileWidth
-        cellY = i_pixel[1] // tileHeight
+        tile_size = self.theme.getTileset(self.__brushLayer).tileSize
+        # Use vectorDivI to divide pixel coordinates by tile size
+        coords = vectorDivI(i_pixel, tile_size)
 
         # If out of render window
-        if not (0 <= cellX < self.__world.width) or not (0 <= cellY < self.__world.height):
+        if not self.__world.contains(coords):
             return None
 
-        return cellX, cellY
+        return coords
 
     def __updateCell(self, cell: Tuple[int, int], i_mouse : Mouse):
         

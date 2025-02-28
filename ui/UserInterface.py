@@ -9,6 +9,7 @@ from ui.Mouse import Mouse
 from ui.MouseWheel import MouseWheel
 from ui.Theme import Theme
 from ui.mode import GameMode
+from tools.vector import vectorDivF
 
 
 class UserInterface:
@@ -164,8 +165,10 @@ class UserInterface:
             
             # Scale the rendering to the window/screen size
             rescaledSurface = pygame.transform.scale(renderSurface, (rescaledSurfaceWidth, rescaledSurfaceHeight))
-            self.__rescaledScaleX = rescaledSurface.get_width() / renderSurface.get_width()
-            self.__rescaledScaleY = rescaledSurface.get_height() / renderSurface.get_height()
+            # Calculate scale using vectorDivF
+            scales = vectorDivF(rescaledSurface.get_size(), renderSurface.get_size())
+            self.__rescaledScaleX = scales[0] 
+            self.__rescaledScaleY = scales[1]
             self.__window.blit(rescaledSurface, (self.__rescaledX, self.__rescaledY))
 
     # main game loop
