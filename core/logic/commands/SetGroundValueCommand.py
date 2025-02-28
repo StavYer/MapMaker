@@ -10,7 +10,7 @@ class SetGroundValueCommand(SetLayerValueCommand):
     def check(self, i_logic: Logic) -> bool:
         # Check if the value is valid
         value = self._value
-        if not checkCellValue(value):
+        if not checkCellValue("ground", value):
             return False
 
         coords = self._coords
