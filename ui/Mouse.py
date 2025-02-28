@@ -7,27 +7,27 @@ class Mouse:
         self.coords = coords
         self.buttons = buttons
 
-        @property
-        def x(self) -> int:
-        # Get the x-coordinate of the mouse.
-            return self.coords[0]
+    @property
+    def x(self) -> int:
+    # Get the x-coordinate of the mouse.
+        return self.coords[0]
 
-        @property
-        def y(self) -> int:
+    @property
+    def y(self) -> int:
         # Get the y-coordinate of the mouse.
-            return self.coords[1]
+        return self.coords[1]
 
-        @property
-        def button1(self) -> bool:
+    @property
+    def button1(self) -> bool:
         # Get the state of the first mouse button.
-            return self.buttons[0]
+        return self.buttons[0]
 
-        @property
-        def button2(self) -> bool:
+    @property
+    def button2(self) -> bool:
         # Get the state of the second mouse button.
-            return self.buttons[1]
+        return self.buttons[1]
 
-        @property
-        def button3(self) -> bool:
+    @property
+    def button3(self) -> bool:
         # Get the state of the third mouse button.
-            return self.buttons[2]
+        return self.buttons[2]

@@ -4,9 +4,9 @@ from typing import Dict
 from .Command import Command
 from ..state import World
 
-from .command.SetGroundValueCommand import SetGroundValueCommand
-from .command.SetImpassableValueCommand import SetImpassableValueCommand
-from .command.SetObjectsValueCommand import SetObjectsValueCommand
+from .commands.SetGroundValueCommand import SetGroundValueCommand
+from .commands.SetImpassableValueCommand import SetImpassableValueCommand
+from .commands.SetObjectsValueCommand import SetObjectsValueCommand
 
 
 class Logic:

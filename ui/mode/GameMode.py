@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 
 from pygame.surface import Surface
 
-from ui.MouseButtons import MouseButtons
+from ui.Mouse import Mouse
 from ui.MouseWheel import MouseWheel
 from ui.Theme import Theme
 

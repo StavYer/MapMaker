@@ -2,8 +2,12 @@
 from __future__ import annotations
 
 from core.constants import CellValue, checkCellValue
+from typing import TYPE_CHECKING
+
+from core.constants import CellValue, checkCellValue
 from .SetLayerValueCommand import SetLayerValueCommand
-from ..Logic import Logic
+if TYPE_CHECKING:
+    from ..Logic import Logic
 
 class SetImpassableValueCommand(SetLayerValueCommand):
     # Check if the command can be executed

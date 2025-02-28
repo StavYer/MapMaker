@@ -137,10 +137,10 @@ class EditGameMode(GameMode):
 
         self.__updateCell(cellCoordinates, i_mouse)
     
-    def mouseButtonUp(self, i_mouseX: int, i_mouseY: int, i_mouse : Mouse):
+    def mouseButtonUp(self, i_mouse : Mouse):
         self.__mouseButtonDown = False
 
-    def mouseEnter(self, i_mouseX: int, i_mouseY: int, i_mouse : Mouse):
+    def mouseEnter(self, i_mouse : Mouse):
         self.__mouseButtonDown = False
 
     def mouseLeave(self):
