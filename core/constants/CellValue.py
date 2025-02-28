@@ -25,3 +25,14 @@ CellValueRanges = {
     "impassable": (201, 204),
     "objects": (301, 311)
 }
+
+def checkCellValue(layer: str, value: CellValue):
+    """
+    Checks if the given cell value is valid for the specified layer.
+    """
+    if layer != "ground" and value == CellValue.NONE:
+        return True
+    
+    # check if whithin the range
+    valueRange = CellValueRanges[layer]
+    return valueRange[0] <= value < valueRange[1]
