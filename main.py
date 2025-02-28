@@ -9,7 +9,7 @@ world = World(20, 15)
 ground = world.ground
 for y in range(0, world.height):
     for x in range(0, world.width):
-        ground.set_cell_value(x, y, CellValue.GROUND_EARTH)
+        ground.set_cell_value(x, y, CellValue.GROUND_SEA)
 
 # Create a user interface object and run it
 theme = Theme()
