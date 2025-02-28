@@ -1,1 +1,1 @@
-from .CellValue import CellValue, CellValueRanges
+from .CellValue import CellValue, CellValueRanges, checkCellValue
