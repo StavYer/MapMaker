@@ -42,5 +42,6 @@ class Logic:
             "impassable": SetImpassableValueCommand,
             "objects": SetObjectsValueCommand,
         }
+        
         return setLayerValueCommand[i_layer]
 

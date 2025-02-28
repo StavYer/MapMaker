@@ -6,8 +6,9 @@ from pygame.surface import Surface
 
 from core.constants import CellValue, CellValueRanges
 from core.state import World
+from core.logic import Logic
 from ..LayerComponent import LayerComponent
-from ..MouseButtons import MouseButtons
+from ..Mouse import Mouse
 from ..Theme import Theme
 from .GameMode import GameMode
 
@@ -17,6 +18,7 @@ class EditGameMode(GameMode):
     def __init__(self, i_theme: Theme, i_world: World):
         super().__init__(i_theme)
         self.__world = i_world
+        self.__logic = Logic(i_world)
         self.__mouseButtonDown = False # True if player clicked inside world
         self.__layers = [
             LayerComponent(i_theme, i_world, name) for name in i_world.layerNames
@@ -29,7 +31,7 @@ class EditGameMode(GameMode):
         pass
 
     def update(self):
-        pass
+        self.__logic.executeCommands()
 
     def render(self, i_surface: Surface):
         # Render layers
@@ -82,28 +84,39 @@ class EditGameMode(GameMode):
 
         return cellX, cellY
 
-    def __updateCell(self, i_cellX: int, i_cellY: int, i_buttons: MouseButtons):
+    def __updateCell(self, i_cellX: int, i_cellY: int, i_mouse : Mouse):
         
         layer = self.__world.getLayer(self.__brushLayer)
         # update cell based on mouse button (left or right)
-        if i_buttons.button1:
-            if self.__brushLayer == "ground" and layer.get_cell_value(i_cellX, i_cellY) == CellValue.GROUND_SEA:
-                layer.set_cell_value(i_cellX, i_cellY, CellValue.GROUND_EARTH)
+        if i_mouse.button1 or i_mouse.button2:
+            if self.__brushLayer == "ground":
+                # If layer is ground, set value to ground
+                value = CellValue.GROUND_EARTH
             
             elif self.__brushLayer != "ground":
+                # Else, choose random value
                 minValue = CellValueRanges[self.__brushLayer][0]
                 maxValue = CellValueRanges[self.__brushLayer][1]
-                value = random.randint(minValue, maxValue - 1)
-                layer.set_cell_value(i_cellX, i_cellY, CellValue(value))
+                value = CellValue(random.randint(minValue, maxValue - 1))     
 
-        elif i_buttons.button3:
+        elif i_mouse.button3:
+            # "delete" appropriately
             if self.__brushLayer == "ground":
-                layer.set_cell_value(i_cellX, i_cellY, CellValue.GROUND_SEA)
+                value = CellValue.GROUND_SEA
             
             else:
-                layer.set_cell_value(i_cellX, i_cellY, CellValue.NONE)
+                value = CellValue.NONE
+        else:
+            return
+        
+        # Get the appropriate set layer value command and add it to waiting commands.
+        Command = self.__logic.getSetLayerValueCommand(self.__brushLayer)
+        command = Command((i_cellX, i_cellY), value)
+        self.__logic.addCommand(command)
+        
 
-    def mouseButtonDown(self, i_mouseX: int, i_mouseY: int, buttons: MouseButtons):
+
+    def mouseButtonDown(self, i_mouseX: int, i_mouseY: int, i_mouse : Mouse):
         cellCoordinates = self.__computeCellCoordinates(i_mouseX, i_mouseY)
 
         # If none, means we are outside render window
@@ -112,9 +125,9 @@ class EditGameMode(GameMode):
 
         cellX, cellY = cellCoordinates
         self.__mouseButtonDown = True
-        self.__updateCell(cellX, cellY, buttons)
+        self.__updateCell(cellX, cellY, i_mouse)
 
-    def mouseMove(self, i_mouseX: int, i_mouseY: int, buttons: MouseButtons):
+    def mouseMove(self, i_mouseX: int, i_mouseY: int, i_mouse : Mouse):
         if not self.__mouseButtonDown:
             return
 
@@ -124,12 +137,12 @@ class EditGameMode(GameMode):
             return
 
         cellX, cellY = cellCoordinates
-        self.__updateCell(cellX, cellY, buttons)
+        self.__updateCell(cellX, cellY, i_mouse)
     
-    def mouseButtonUp(self, i_mouseX: int, i_mouseY: int, buttons: MouseButtons):
+    def mouseButtonUp(self, i_mouseX: int, i_mouseY: int, i_mouse : Mouse):
         self.__mouseButtonDown = False
 
-    def mouseEnter(self, i_mouseX: int, i_mouseY: int, buttons: MouseButtons):
+    def mouseEnter(self, i_mouseX: int, i_mouseY: int, i_mouse : Mouse):
         self.__mouseButtonDown = False
 
     def mouseLeave(self):
