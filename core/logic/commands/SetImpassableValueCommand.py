@@ -48,3 +48,11 @@ class SetImpassableValueCommand(SetLayerValueCommand):
         world = i_logic.world
         # Set the impassable cell value in the world
         world.impassable.set_cell_value(coords[0], coords[1], value)
+        
+        # If fill is enabled, recursively add commands for adjacent cells
+        if hasattr(self, '_fill') and self._fill:
+            x, y = coords[0], coords[1]
+            i_logic.addCommand(SetImpassableValueCommand((x + 1, y), value, True))
+            i_logic.addCommand(SetImpassableValueCommand((x - 1, y), value, True))
+            i_logic.addCommand(SetImpassableValueCommand((x, y + 1), value, True))
+            i_logic.addCommand(SetImpassableValueCommand((x, y - 1), value, True))

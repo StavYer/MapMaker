@@ -7,9 +7,10 @@ from ..Command import Command, WORLD_PRIORITY, WORLD_MAX_WIDTH
 
 
 class SetLayerValueCommand(Command):
-    def __init__(self, i_coords: Tuple[int, int], i_value: CellValue):
+    def __init__(self, i_coords: Tuple[int, int], i_value: CellValue, i_fill: bool = False):
         self._coords = i_coords
         self._value = i_value
+        self._fill = i_fill
 
     def priority(self) -> int:
         """

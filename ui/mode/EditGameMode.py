@@ -97,7 +97,10 @@ class EditGameMode(GameMode):
                 # Else, choose random value
                 minValue = CellValueRanges[self.__brushLayer][0]
                 maxValue = CellValueRanges[self.__brushLayer][1]
-                value = CellValue(random.randint(minValue, maxValue - 1))     
+                value = CellValue(random.randint(minValue, maxValue - 1))  
+
+            # Set fill to True if middle mouse button is pressed
+            fill = i_mouse.button2  
 
         elif i_mouse.button3:
             # "delete" appropriately
@@ -106,12 +109,13 @@ class EditGameMode(GameMode):
             
             else:
                 value = CellValue.NONE
+            fill = False
         else:
             return
         
         # Get the appropriate set layer value command and add it to waiting commands.
         Command = self.__logic.getSetLayerValueCommand(self.__brushLayer)
-        command = Command(cell, value)
+        command = Command(cell, value, fill)
         self.__logic.addCommand(command)
         
 

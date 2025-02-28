@@ -50,3 +50,11 @@ class SetGroundValueCommand(SetLayerValueCommand):
         
         # Set the ground value at the specified coordinates
         ground.set_cell_value(coords[0], coords[1], value)
+
+        # If fill is enabled, recursively add commands for adjacent cells
+        if hasattr(self, '_fill') and self._fill:
+            x, y = coords[0], coords[1]
+            i_logic.addCommand(SetGroundValueCommand((x + 1, y), value, True))
+            i_logic.addCommand(SetGroundValueCommand((x - 1, y), value, True))
+            i_logic.addCommand(SetGroundValueCommand((x, y + 1), value, True))
+            i_logic.addCommand(SetGroundValueCommand((x, y - 1), value, True))

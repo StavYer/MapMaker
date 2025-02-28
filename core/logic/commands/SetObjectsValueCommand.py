@@ -44,3 +44,11 @@ class SetObjectsValueCommand(SetLayerValueCommand):
         world = i_logic.world
         # Set the cell value in the objects layer
         world.objects.set_cell_value(coords[0], coords[1], value)
+    
+        # If fill is enabled, recursively add commands for adjacent cells
+        if hasattr(self, '_fill') and self._fill:
+            x, y = coords[0], coords[1]
+            i_logic.addCommand(SetObjectsValueCommand((x + 1, y), value, True))
+            i_logic.addCommand(SetObjectsValueCommand((x - 1, y), value, True))
+            i_logic.addCommand(SetObjectsValueCommand((x, y + 1), value, True))
+            i_logic.addCommand(SetObjectsValueCommand((x, y - 1), value, True))
