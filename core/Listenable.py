@@ -17,13 +17,13 @@ class Listenable(Generic[IListener]):
         """Get all registered listeners."""
         return self.__listeners
 
-    def registerListener(self, listener: IListener):
+    def registerListener(self, i_listener: IListener):
         """Register a listener to receive notifications."""
-        self.__listeners.append(listener)
+        self.__listeners.append(i_listener)
 
-    def removeListener(self, listener: IListener):
+    def removeListener(self, i_listener: IListener):
         """Remove a listener to stop receiving notifications."""
-        self.__listeners.remove(listener)
+        self.__listeners.remove(i_listener)
 
     def removeAllListeners(self):
         """Remove all listeners."""
