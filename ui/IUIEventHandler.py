@@ -9,15 +9,15 @@ if TYPE_CHECKING:
 class IUIEventHandler(ABC):
     """Interface for objects that can handle UI events."""
     
-    def keyDown(self, key: int) -> bool:
+    def keyDown(self, i_key: int) -> bool:
         """Called when a key is pressed."""
         return False
     
-    def keyUp(self, key: int) -> bool:
+    def keyUp(self, i_key: int) -> bool:
         """Called when a key is released."""
         return False
     
-    def mouseEnter(self, mouse: 'Mouse') -> bool:
+    def mouseEnter(self, i_mouse: 'Mouse') -> bool:
         """Called when mouse enters the component area."""
         return False
     
@@ -25,18 +25,18 @@ class IUIEventHandler(ABC):
         """Called when mouse leaves the component area."""
         return False
     
-    def mouseButtonDown(self, mouse: 'Mouse') -> bool:
+    def mouseButtonDown(self, i_mouse: 'Mouse') -> bool:
         """Called when a mouse button is pressed."""
         return False
     
-    def mouseButtonUp(self, mouse: 'Mouse') -> bool:
+    def mouseButtonUp(self, i_mouse: 'Mouse') -> bool:
         """Called when a mouse button is released."""
         return False
     
-    def mouseWheel(self, mouse: 'Mouse', wheel: 'MouseWheel') -> bool:
+    def mouseWheel(self, i_mouse: 'Mouse', i_wheel: 'MouseWheel') -> bool:
         """Called when mouse wheel is scrolled."""
         return False
     
-    def mouseMove(self, mouse: 'Mouse') -> bool:
+    def mouseMove(self, i_mouse: 'Mouse') -> bool:
         """Called when mouse is moved."""
         return False
