@@ -20,6 +20,7 @@ class LayerComponent(Component, ILayerListener):
         # Retrieve the layer and its matching tileset using the given name.
         self.__layer = i_world.getLayer(i_name)
         self.__tileset = i_theme.getTileset(i_name)
+        self.__needRefresh = True
         
         # Register as a listener to get notifications about cell changes
         self.__layer.registerListener(self)
@@ -28,6 +29,10 @@ class LayerComponent(Component, ILayerListener):
         """Remove this component from the layer's listeners when disposed."""
         super().dispose()
         self.__layer.removeListener(self)
+
+    def needRefresh(self) -> bool:
+        """Check if the layer needs to be redrawn"""
+        return self._needRefresh
 
     def render(self, i_surface: Surface):
         """Render the layer to the provided surface."""
