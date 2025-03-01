@@ -4,5 +4,6 @@ from .MouseWheel import MouseWheel
 from ui.theme.Theme import Theme
 from ui.component.LayerComponent import LayerComponent
 from ui.theme.Tileset import Tileset
-from .component.LayerComponent import LayerComponent
+from .component.world.LayerComponent import LayerComponent
 from .component.CacheComponent import CacheComponent
+from .IUIEventHandler import IUIEventHandler

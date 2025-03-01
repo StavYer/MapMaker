@@ -1,189 +1,227 @@
-from typing import Optional
+from typing import Optional, Tuple, List
 
 import pygame
-from pygame import Rect
 from pygame.constants import HWSURFACE, DOUBLEBUF, RESIZABLE
 from pygame.surface import Surface
 
+from tools.vector import vectorDivF
+from ui.IUIEventHandler import IUIEventHandler
 from ui.Mouse import Mouse
 from ui.MouseWheel import MouseWheel
+from ui.mode.GameMode import GameMode
 from ui.theme.Theme import Theme
-from ui.mode import GameMode
-from tools.vector import vectorDivF
-
 
 class UserInterface:
-    def __init__(self, input_theme : Theme):
-        # Create a resizable window of size 1920 x 1080, with faster rendering on screen
+    """Main user interface class that handles rendering and input"""
+    
+    def __init__(self, theme: Theme):
+        # Initialize pygame
         pygame.init()
         self.__window = pygame.display.set_mode((1024, 768), HWSURFACE | DOUBLEBUF | RESIZABLE)
-        # Set game caption and icon
         pygame.display.set_caption("TacticsGame")
         pygame.display.set_icon(pygame.image.load("assets/toen/icon.png"))
-
-        # Rendering
-        self.__theme = input_theme
-        self.__rescaledX = 0    # Horizontal offset of the rescaled game within the window.
-        self.__rescaledY = 0    # Vertical offset of the rescaled game within the window.
-        self.__rescaledScaleX = 1.0    # Horizontal scaling factor applied to the rendered surface.
-        self.__rescaledScaleY = 1.0    # Vertical scaling factor applied to the rendered surface.
-        self.__renderWidth = self.__window.get_width()
-        self.__renderHeight = self.__window.get_height()
-
-        # Inputs
+        
+        # Rendering properties
+        self.__theme = theme
+        self.__rescaledShift = (0, 0)
+        self.__rescaledScale = (1.0, 1.0)
+        self.__renderSize = (self.__window.get_width(), self.__window.get_height())
+        self.__font = theme.getFont("default")
+        
+        # Input handling
         self.__mouseFocus = False
-
-        # Other
-        self.__gameMode : Optional[GameMode] = None
+        
+        # Game properties
+        self.__gameMode: Optional[GameMode] = None
         self.__running = True
-        self.__clock = pygame.time.Clock() 
-
+        self.__clock = pygame.time.Clock()
+    
     @property
     def theme(self) -> Theme:
         return self.__theme
-
-    def setGameMode(self, i_gameMode: GameMode):
-        self.__gameMode = i_gameMode
-
-    def setRenderSize(self, i_renderWidth: int, i_renderHeight: int):
-        self.__renderWidth = i_renderWidth
-        self.__renderHeight = i_renderHeight
     
-    def __processKeyEvent(self, i_event):
-        # Check there is a game mode, otherwise there's no event to notify
-        if self.__gameMode is None:
-            return
-
-        # If key is pressed, notify game mode
-        if i_event.type == pygame.KEYDOWN:
-            self.__gameMode.keyDown(i_event.key)
-
-        # If key is released, notify game mode
-        elif i_event.type == pygame.KEYUP:
-            self.__gameMode.keyUp(i_event.key)
+    def setGameMode(self, gameMode: GameMode):
+        """Set the current game mode"""
+        self.__gameMode = gameMode
     
-    def __processMouseEvent(self, i_event):
-        # Check there is a game mode, otherwise there's no event to notify
-        if self.__gameMode is None:
-            return
-
-        # If mouse leaves window, set focus to false and notify game mode
-        if i_event.type == pygame.ACTIVEEVENT:
-            if self.__mouseFocus:
+    def setRenderSize(self, width: int, height: int):
+        """Set the render size"""
+        self.__renderSize = (width, height)
+    
+    def getEventHandlers(self) -> List[IUIEventHandler]:
+        """Get all event handlers"""
+        return [mode for mode in [
+            self.__gameMode
+        ] if mode is not None]
+    
+    # Event handling methods
+    def handleKeyDown(self, key: int) -> bool:
+        """Handle key press event"""
+        for handler in self.getEventHandlers():
+            if handler.keyDown(key):
+                return True
+        return False
+    
+    def handleKeyUp(self, key: int) -> bool:
+        """Handle key release event"""
+        for handler in self.getEventHandlers():
+            if handler.keyUp(key):
+                return True
+        return False
+    
+    def handleMouseEnter(self, mouse: Mouse) -> bool:
+        """Handle mouse enter event"""
+        for handler in self.getEventHandlers():
+            if handler.mouseEnter(mouse):
+                return True
+        return False
+    
+    def handleMouseLeave(self) -> bool:
+        """Handle mouse leave event"""
+        for handler in self.getEventHandlers():
+            if handler.mouseLeave():
+                return True
+        return False
+    
+    def handleMouseButtonDown(self, mouse: Mouse) -> bool:
+        """Handle mouse button press event"""
+        for handler in self.getEventHandlers():
+            if handler.mouseButtonDown(mouse):
+                return True
+        return False
+    
+    def handleMouseButtonUp(self, mouse: Mouse) -> bool:
+        """Handle mouse button release event"""
+        for handler in self.getEventHandlers():
+            if handler.mouseButtonUp(mouse):
+                return True
+        return False
+    
+    def handleMouseWheel(self, mouse: Mouse, wheel: MouseWheel) -> bool:
+        """Handle mouse wheel event"""
+        for handler in self.getEventHandlers():
+            if handler.mouseWheel(mouse, wheel):
+                return True
+        return False
+    
+    def handleMouseMove(self, mouse: Mouse) -> bool:
+        """Handle mouse movement event"""
+        for handler in self.getEventHandlers():
+            if handler.mouseMove(mouse):
+                return True
+        return False
+    
+    def __processKeyEvent(self, event):
+        """Process keyboard events"""
+        if event.type == pygame.KEYDOWN:
+            self.handleKeyDown(event.key)
+        elif event.type == pygame.KEYUP:
+            self.handleKeyUp(event.key)
+    
+    def __processMouseEvent(self, event):
+        """Process mouse events"""
+        if event.type == pygame.ACTIVEEVENT:
+            if event.gain == 0 and self.__mouseFocus:
                 self.__mouseFocus = False
-                self.__gameMode.mouseLeave()
+                self.handleMouseLeave()
             return
-
-        # Build mouse data
-        mouseX, mouseY = pygame.mouse.get_pos()  # Get mouse position in screen coordinates.
-        mouseX = int((mouseX - self.__rescaledX) / self.__rescaledScaleX)  # Convert screen X to game world X.
-        mouseY = int((mouseY - self.__rescaledY) / self.__rescaledScaleY)  # Convert screen Y to game world Y.
-        # Get state of mouse buttons and store it
+        
+        # Convert mouse coordinates
+        mouseX, mouseY = pygame.mouse.get_pos()
+        mouseX = int((mouseX - self.__rescaledShift[0]) / self.__rescaledScale[0])
+        mouseY = int((mouseY - self.__rescaledShift[1]) / self.__rescaledScale[1])
         pygameButtons = pygame.mouse.get_pressed(num_buttons=3)
         mouse = Mouse((mouseX, mouseY), pygameButtons)
-
-        # If mouse is within the render window, notify the game mode appropriately
-        if 0 <= mouseX < self.__renderWidth \
-                and 0 <= mouseY < self.__renderHeight:  
-
+        
+        # Check if mouse is in render area
+        if 0 <= mouseX < self.__renderSize[0] and 0 <= mouseY < self.__renderSize[1]:
             if not self.__mouseFocus:
                 self.__mouseFocus = True
-                self.__gameMode.mouseEnter(mouse)
-
-            if i_event.type == pygame.MOUSEBUTTONDOWN:
-                self.__gameMode.mouseButtonDown(mouse)
-
-            elif i_event.type == pygame.MOUSEBUTTONUP:
-                self.__gameMode.mouseButtonUp(mouse)
-
-            elif i_event.type == pygame.MOUSEWHEEL:
-                wheel = MouseWheel(i_event.x, i_event.y, i_event.flipped)
-                self.__gameMode.mouseWheel(mouse, wheel)
-
-            elif i_event.type == pygame.MOUSEMOTION:
-                self.__gameMode.mouseMove(mouse)
-
-        # Otherwise, notify that it's outside the render window.
+                self.handleMouseEnter(mouse)
+            
+            # Process specific mouse events
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                self.handleMouseButtonDown(mouse)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                self.handleMouseButtonUp(mouse)
+            elif event.type == pygame.MOUSEWHEEL:
+                wheel = MouseWheel(event.x, event.y, event.flipped, event.which)
+                self.handleMouseWheel(mouse, wheel)
+            elif event.type == pygame.MOUSEMOTION:
+                self.handleMouseMove(mouse)
         elif self.__mouseFocus:
             self.__mouseFocus = False
-            self.__gameMode.mouseLeave()
-
+            self.handleMouseLeave()
+    
     def processInput(self):
-        """Handles all input events from the user."""
+        """Process all input events"""
         for event in pygame.event.get():
-                if event.type == pygame.QUIT:  # First, if user wants to quit
+            if event.type == pygame.QUIT:
+                self.__running = False
+                break
+            elif event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
+                if event.key == pygame.K_ESCAPE:
                     self.__running = False
                     break
-
-                elif event.type == pygame.KEYDOWN \
-                    or event.type == pygame.KEYUP:  # Else, handle keyboard events
-
-                    # User wants to quit game
-                    if event.key == pygame.K_ESCAPE:
-                        self.__running = False
-                        break
-                    
-                    self.__processKeyEvent(event)
-
-                elif event.type == pygame.ACTIVEEVENT:
-                    # Handle focus changes
-                    if event.state & pygame.APPMOUSEFOCUS == pygame.APPMOUSEFOCUS:
-                        # If the mouse focus state has changed, process mouse events
-                        self.__processMouseEvent
-                
-                elif event.type == pygame.MOUSEBUTTONDOWN \
-                        or event.type == pygame.MOUSEBUTTONUP \
-                        or event.type == pygame.MOUSEMOTION \
-                        or event.type == pygame.MOUSEWHEEL:
-                         # Handle all mouse-related events (button presses, movement, wheel)
-                    self.__processMouseEvent(event)
-
+                self.__processKeyEvent(event)
+            elif event.type == pygame.ACTIVEEVENT:
+                self.__processMouseEvent(event)
+            elif event.type in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, 
+                               pygame.MOUSEWHEEL, pygame.MOUSEMOTION):
+                self.__processMouseEvent(event)
+    
     def update(self):
+        """Update game state"""
         if self.__gameMode is not None:
-            self.__gameMode.update()    
-
+            self.__gameMode.update()
+    
     def render(self):
-        # Render world in a surface, and call GameMode's render method
-        renderSurface = Surface((self.__renderWidth, self.__renderHeight))
+        """Render the game"""
+        # Render to a surface
+        renderSurface = Surface(self.__renderSize)
         if self.__gameMode is not None:
             self.__gameMode.render(renderSurface)
         
-        # Scale rendering when resizing window
-            windowWidth, windowHeight = self.__window.get_size()
-            renderRatio = self.__renderWidth / self.__renderHeight  # Compute aspect ratios of window and scene surfaces
-            windowRatio = windowWidth / windowHeight
-
-            if windowRatio <= renderRatio:  # We can use full window width but not height
-                rescaledSurfaceWidth, rescaledSurfaceHeight = windowWidth, (windowWidth // renderRatio)
-                self.__rescaledX = 0  # Compute coordinates of rescaled surface
-                self.__rescaledY = (windowHeight - rescaledSurfaceHeight) // 2
-
-            else:  # We can use full window height but not width
-                rescaledSurfaceWidth, rescaledSurfaceHeight = int(windowHeight * renderRatio), windowHeight
-                self.__rescaledX = (windowWidth - rescaledSurfaceWidth) // 2  # Compute coordinates again
-                self.__rescaledY = 0
-            
-            # Scale the rendering to the window/screen size
-            rescaledSurface = pygame.transform.scale(renderSurface, (rescaledSurfaceWidth, rescaledSurfaceHeight))
-            # Calculate scale using vectorDivF
-            scales = vectorDivF(rescaledSurface.get_size(), renderSurface.get_size())
-            self.__rescaledScaleX = scales[0] 
-            self.__rescaledScaleY = scales[1]
-            self.__window.blit(rescaledSurface, (self.__rescaledX, self.__rescaledY))
-
-    # main game loop
-    def run(self):
+        # Scale the rendered surface to fit the window
+        windowWidth, windowHeight = self.__window.get_size()
+        renderRatio = self.__renderSize[0] / self.__renderSize[1]
+        windowRatio = windowWidth / windowHeight
         
+        if windowRatio <= renderRatio:
+            rescaledSize = (windowWidth, int(windowWidth / renderRatio))
+            self.__rescaledShift = (0, (windowHeight - rescaledSize[1]) // 2)
+        else:
+            rescaledSize = (int(windowHeight * renderRatio), windowHeight)
+            self.__rescaledShift = ((windowWidth - rescaledSize[0]) // 2, 0)
+        
+        # Scale and blit the rendered surface
+        rescaledSurface = pygame.transform.scale(renderSurface, rescaledSize)
+        self.__rescaledScale = vectorDivF(rescaledSurface.get_size(), renderSurface.get_size())
+        self.__window.blit(rescaledSurface, self.__rescaledShift)
+        
+        # Draw frame time
+        frameTime = self.__clock.get_rawtime()
+        textSurface = self.__font.render(f"{frameTime}ms", False, (255, 255, 255), (0, 0, 0))
+        self.__window.blit(
+            textSurface, (
+                self.__window.get_width() - textSurface.get_width(),
+                self.__window.get_height() - textSurface.get_height()
+            )
+        )
+    
+    def run(self):
+        """Run the game loop"""
         while self.__running:
-            # Input handling
             self.processInput()
-            # Update
             self.update()
-            # Render
             self.render()
-
+            
             pygame.display.update()
             self.__clock.tick(30)
-
+        
+        if self.__gameMode is not None:
+            self.__gameMode.dispose()
+    
     def quit(self):
+        """Quit the game"""
         pygame.quit()
