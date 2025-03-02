@@ -1,9 +1,9 @@
 # ui/IComponentListener.py
-from abc import ABC, abstractmethod
-from typing import Tuple, TYPE_CHECKING
+from abc import ABC
+from typing import Tuple, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .Mouse import Mouse
+    from ui.Mouse import Mouse
 
 class IComponentListener(ABC):
     """Interface for objects that want to receive notifications about component events."""
@@ -14,4 +14,12 @@ class IComponentListener(ABC):
     
     def worldCellEntered(self, i_cell: Tuple[int, int], i_mouse: 'Mouse', i_dragging: bool) -> None:
         """Called when mouse enters a cell in the world."""
+        pass
+        
+    def mainBrushSelected(self, i_layerName: str, i_value: Union[int, str]) -> None:
+        """Called when the main brush is selected."""
+        pass
+        
+    def secondaryBrushSelected(self, i_layerName: str, i_value: Union[int, str]) -> None:
+        """Called when the secondary brush is selected."""
         pass
