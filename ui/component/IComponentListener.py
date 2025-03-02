@@ -12,6 +12,6 @@ class IComponentListener(ABC):
         """Called when a cell in the world is clicked."""
         pass
     
-    def worldCellEntered(self, i_cell: Tuple[int, int], i_mouse: 'Mouse') -> None:
+    def worldCellEntered(self, i_cell: Tuple[int, int], i_mouse: 'Mouse', i_dragging: bool) -> None:
         """Called when mouse enters a cell in the world."""
         pass

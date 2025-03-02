@@ -6,7 +6,7 @@ from ui.Mouse import Mouse
 from ui.theme.Theme import Theme
 from ui.IUIEventHandler import IUIEventHandler
 from ..CompositeComponent import CompositeComponent
-from ..LayerComponent import LayerComponent
+from .LayerComponent import LayerComponent
 
 class WorldComponent(CompositeComponent, IUIEventHandler):
     """Component that renders a world with multiple layers"""
@@ -18,12 +18,12 @@ class WorldComponent(CompositeComponent, IUIEventHandler):
         self.__mouseButtonDown = False
         
         # Create layer components for each layer in the world
-        for name in world.layerNames:
-            layer = LayerComponent(theme, world, name)
+        for name in i_world.layerNames:
+            layer = LayerComponent(i_theme, i_world, name)
             self.addComponent(layer, cache=True)
             
         # Get the tile size from the first layer's tileset
-        self.__tileSize = theme.getTileset(world.layerNames[0]).tileSize
+        self.__tileSize = i_theme.getTileset(i_world.layerNames[0]).tileSize
     
     def __computeCellCoordinates(self, i_pixel: Tuple[int, int]) -> Optional[Tuple[int, int]]:
         """Convert pixel coordinates to cell coordinates"""
@@ -36,7 +36,7 @@ class WorldComponent(CompositeComponent, IUIEventHandler):
     def mouseButtonDown(self, i_mouse: Mouse) -> bool:
         """Handle mouse button press"""
         super().mouseButtonDown(i_mouse)
-        cell = self.__computeCellCoordinates(mouse.coords)
+        cell = self.__computeCellCoordinates(i_mouse.coords)
         if cell is None:
             return False
         self.__mouseButtonDown = True

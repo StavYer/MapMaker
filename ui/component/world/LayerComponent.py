@@ -8,7 +8,7 @@ from typing import Tuple
 
 from core.constants import CellValue
 from core.state import World, Layer, ILayerListener
-from .Component import Component
+from ..Component import Component
 from ui.theme.Theme import Theme
 
 

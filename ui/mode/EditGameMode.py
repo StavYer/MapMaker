@@ -102,7 +102,7 @@ class EditGameMode(GameMode, IComponentListener):
         """Handle world cell click"""
         self.__updateCell(cell, i_mouse)
 
-    def worldCellEntered(self, cell: Tuple[int, int], i_mouse: Mouse, dragging: bool):
+    def worldCellEntered(self, cell: Tuple[int, int], i_mouse: Mouse, i_dragging: bool):
         """Handle mouse entering a world cell"""
         if dragging:
             self.__updateCell(cell, i_mouse)

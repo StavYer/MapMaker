@@ -5,7 +5,7 @@ from pygame.surface import Surface
 
 from ui.theme.Theme import Theme
 from core.Listenable import Listenable
-from ui.IComponentListener import IComponentListener
+from ui.component.IComponentListener import IComponentListener
 
 class Component(Listenable[IComponentListener]):
     """Base class for UI components that can be rendered and notify listeners."""
@@ -38,7 +38,7 @@ class Component(Listenable[IComponentListener]):
         for listener in self.listeners:
             listener.worldCellClicked(i_cell, i_mouse)
     
-    def notifyWorldCellEntered(self, i_cell: tuple[int, int], i_mouse: 'Mouse') -> None:
+    def notifyWorldCellEntered(self, i_cell: tuple[int, int], i_mouse: 'Mouse', i_dragging: bool) -> None:
         """Notify all listeners that the mouse entered a cell."""
         for listener in self.listeners:
-            listener.worldCellEntered(i_cell, i_mouse)
+            listener.worldCellEntered(i_cell, i_mouse, i_dragging)
