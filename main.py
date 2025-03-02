@@ -1,6 +1,9 @@
+import logging
 from core.state import World
 from core.constants import CellValue
 from ui import UserInterface, Theme
+
+logging.basicConfig(level=logging.INFO, format='\r%(asctime)s %(filename)s:%(lineno)d: %(message)s')
 
 # Create a basic game state
 from ui.mode import EditGameMode

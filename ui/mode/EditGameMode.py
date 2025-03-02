@@ -31,6 +31,9 @@ class EditGameMode(GameMode, IComponentListener):
         # Set default brush layer
         self.__brushLayer = "ground"
 
+        # Listener
+        self.__worldComponent.registerListener(self)
+
         
 
     def update(self):
@@ -102,7 +105,7 @@ class EditGameMode(GameMode, IComponentListener):
         """Handle world cell click"""
         self.__updateCell(cell, i_mouse)
 
-    def worldCellEntered(self, cell: Tuple[int, int], i_mouse: Mouse, i_dragging: bool):
+    def worldCellEntered(self, i_cell: Tuple[int, int], i_mouse: Mouse, i_dragging: bool):
         """Handle mouse entering a world cell"""
-        if dragging:
-            self.__updateCell(cell, i_mouse)
+        if i_dragging:
+            self.__updateCell(i_cell, i_mouse)
