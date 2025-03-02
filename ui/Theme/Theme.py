@@ -32,6 +32,9 @@ class Theme:
             # Store the constructed tileset using its name as the key.
             self.__tilesets[name] = tileset
 
+        # Set the frame border size based on the tile size of the "frame" tileset.
+        self.__frameBorderSize = self.__tilesets["frame"].tileSize[0]
+
         # Define default font settings.
         self.__fontsDef = {
             "default": {
@@ -45,6 +48,21 @@ class Theme:
         }
         # Initialize a cache for loaded font objects.
         self.__fonts = {}
+
+    @property
+    def frameBorderSize(self) -> int:
+        # Return the size of the frame border.
+        return self.__frameBorderSize
+
+    @property
+    def viewSize(self) -> Tuple[int, int]:
+        # Return the current view size.
+        return self.__viewSize
+
+    @viewSize.setter
+    def viewSize(self, size: Tuple[int, int]):
+        # Set the view size to the given value.
+        self.__viewSize = size
 
     def getSurface(self, i_imageFile: str) -> Surface:
         # Return a cached Surface; load it if not already loaded.
