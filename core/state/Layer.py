@@ -31,6 +31,12 @@ class Layer(Listenable[ILayerListener]):
     def height(self) -> int:
         return self.__height
 
+    def __getitem__(self, coords: Tuple[int, int]) -> CellValue:
+        return self.get_cell_value(coords[0], coords[1])
+    
+    def __setitem__(self, coords: Tuple[int, int], value: CellValue):
+        self.set_cell_value(coords[0],coords[1], value)
+
     # Getter and Setter for a single cell's value
     def get_cell_value(self, input_x: int, input_y: int) -> CellValue:
         # Assert that the coordinates are at between proper limits, otherwise notify

@@ -142,8 +142,6 @@ tilesDefs = {
             CellValue.OBJECTS_ROAD_STONE: (4, 3),
             CellValue.OBJECTS_FARM: [(8, 0), (9, 0), (10, 0), (11, 0)],
             CellValue.OBJECTS_CAMP: (8, 1),
-            "bridgeDirt": [(0, 7), (1, 7)],
-            "bridgeStone": [(4, 7), (5, 7)],
         }
     },
     "frame": {

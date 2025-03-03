@@ -2,46 +2,41 @@ from pygame import Surface
 
 from core.constants import CellValue
 from core.state import World
-from ui.theme.Theme import Theme
 from .LayerComponent import LayerComponent
+from ...theme.Theme import Theme
 
 
 class ObjectsComponent(LayerComponent):
-    """Component that renders the objects layer."""
-    
     def __init__(self, i_theme: Theme, i_world: World):
-        """Initialize with the specific layer name 'objects'."""
+        # Initialize the parent class with theme, world, and layer name "objects"
         super().__init__(i_theme, i_world, "objects")
-        # Keep reference to impassable layer for potential interaction
-        self.__impassableLayer = i_world.impassable
+        # Get the impassable layer from the world
+        self.__impassableLayer = i_world.getLayer("impassable")
 
     def render(self, i_surface: Surface):
-        """Render the objects layer with optional auto-tiling."""
+        # Call the parent class render method
         super().render(i_surface)
-        
+        # Get the tileset surface and tile rectangles
         tileset = self.tileset.surface
-        tilesRect = self.tileset.getTilesRect()
+        tilesRects = self.tileset.getTilesRects()
         tileWidth, tileHeight = self.tileset.tileSize
         
-        # Render each cell in the layer
+        # Loop through each cell in the layer
         for y in range(self.layer.height):
             for x in range(self.layer.width):
-                value = self.layer.get_cell_value(x, y)
+                value = self.layer[x, y]
+                # Skip if the cell value is NONE
                 if value == CellValue.NONE:
                     continue
-                    
-                tileCoords = (x * tileWidth, y * tileHeight)
-                
-                # Auto-tiling: Select from multiple possible tiles using noise
-                if self.autoTiling and value in tilesRect:
-                    # Choose tile based on noise value for consistency
-                    tileRects = tilesRect[value]
-                    if isinstance(tileRects, list):
-                        rectIndex = self.noise[y][x] % len(tileRects)
-                        tileRect = tileRects[rectIndex]
-                    else:
-                        tileRect = tileRects
+                tile = (x * tileWidth, y * tileHeight)
+                # Determine the rectangle to use for the tile
+                if self.autoTiling:
+                    rects = tilesRects[value]
+                    tileCount = len(rects)
+                    rectIndex = self.noise[y][x] % tileCount
+                    rect = rects[rectIndex]
                 else:
-                    tileRect = tilesRect[value]
-                    
-                i_surface.blit(tileset, tileCoords, tileRect)
+                    rect = tilesRects[value][0]
+                # Draw the tile on the surface
+                i_surface.blit(tileset, tile, rect)
+

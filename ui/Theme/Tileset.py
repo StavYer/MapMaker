@@ -79,5 +79,8 @@ class Tileset:
     def getTilesRect(self) -> Dict[Union[int, str], List[Rect]]:
         """Get all tile rectangles."""
         return {value: tileRects[0] for value, tileRects in self.__tilesRects.items()}
+
+    def getTilesRects(self) -> Dict[Union[int, str], List[Rect]]:
+        return self.__tilesRects
     
     
