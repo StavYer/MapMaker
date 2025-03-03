@@ -21,16 +21,9 @@ class Theme:
         self.__surfaces: Dict[str, Surface] = {}
         self.__tilesets: Dict[str, Tileset] = {}
 
-        # Build tilesets from the definitions in tilesDefs.
         for name, tilesDef in tilesDefs.items():
-            # Create a Tileset with the specified tile size and image file.
             tileset = Tileset(self, tilesDef["tileSize"], tilesDef["imageFile"])
-
-            # Add each tile (value and its coordinates) to the tileset.
-            for value, coords in tilesDef["tiles"].items():
-                tileset.addTile(value, coords)
-
-            # Store the constructed tileset using its name as the key.
+            tileset.addTiles(tilesDef["tiles"])
             self.__tilesets[name] = tileset
 
         # Set the frame border size based on the tile size of the "frame" tileset.
@@ -120,8 +113,8 @@ tilesDefs = {
         "imageFile": "toen/ground.png",
         "tileSize": (16, 16),
         "tiles": {
-            CellValue.GROUND_SEA: (4, 7),
-            CellValue.GROUND_EARTH: (2, 7),
+            CellValue.GROUND_SEA: [(4, 7), (5, 7), (6, 7), (7, 7)],
+            CellValue.GROUND_EARTH: [(0, 7), (1, 7), (2, 7), (3, 7)],
         }
     },
     "impassable": {
@@ -130,8 +123,8 @@ tilesDefs = {
         "tiles": {
             CellValue.NONE: (0, 0),
             CellValue.IMPASSABLE_RIVER: (0, 1),
-            CellValue.IMPASSABLE_POND: (1, 0),
-            CellValue.IMPASSABLE_MOUNTAIN: (4, 0),
+            CellValue.IMPASSABLE_POND: [(1, 0), (2, 0), (3, 0)],
+            CellValue.IMPASSABLE_MOUNTAIN: [(4, 0), (5, 0), (6, 0)],
         }
     },
     "objects": {
@@ -140,15 +133,17 @@ tilesDefs = {
         "tiles": {
             CellValue.NONE: (0, 0),
             CellValue.OBJECTS_SIGN: (1, 0),
-            CellValue.OBJECTS_HILL: (4, 0),
-            CellValue.OBJECTS_ROCKS: (6, 1),
-            CellValue.OBJECTS_TREES: (5, 0),
-            CellValue.OBJECTS_MILL: (0, 1),
-            CellValue.OBJECTS_HOUSES: (1, 2),
+            CellValue.OBJECTS_HILL: [(4, 0), (5, 1)],
+            CellValue.OBJECTS_ROCKS: [(6, 1), (7, 1)],
+            CellValue.OBJECTS_TREES: [(5, 0), (6, 0), (7, 0)],
+            CellValue.OBJECTS_MILL: [(0, 1), (1, 1), (2, 1), (3, 1)],
+            CellValue.OBJECTS_HOUSES: [(1, 2), (2, 2), (3, 2), (4, 2), (5, 2), (6, 2), (7, 2)],
             CellValue.OBJECTS_ROAD_DIRT: (0, 3),
             CellValue.OBJECTS_ROAD_STONE: (4, 3),
-            CellValue.OBJECTS_FARM: (8, 0),
+            CellValue.OBJECTS_FARM: [(8, 0), (9, 0), (10, 0), (11, 0)],
             CellValue.OBJECTS_CAMP: (8, 1),
+            "bridgeDirt": [(0, 7), (1, 7)],
+            "bridgeStone": [(4, 7), (5, 7)],
         }
     },
     "frame": {

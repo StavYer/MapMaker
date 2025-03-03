@@ -1,14 +1,15 @@
 from typing import Tuple, Optional
 
-from core.state import World
+from core.state import World, Layer, ILayerListener
 from tools.vector import vectorDivI
 from ui.Mouse import Mouse
 from ui.theme.Theme import Theme
 from ui.IUIEventHandler import IUIEventHandler
 from ..CompositeComponent import CompositeComponent
 from .LayerComponent import LayerComponent
+from .LayerComponentFactory import LayerComponentFactory
 
-class WorldComponent(CompositeComponent, IUIEventHandler):
+class WorldComponent(CompositeComponent, IUIEventHandler, ILayerListener):
     """Component that renders a world with multiple layers"""
     
     def __init__(self, i_theme: Theme, i_world: World):
@@ -17,10 +18,18 @@ class WorldComponent(CompositeComponent, IUIEventHandler):
         self.__previousCell: Optional[Tuple[int, int]] = None
         self.__mouseButtonDown = False
         
-        # Create layer components for each layer in the world
+        # Create layer components using the factory
+        self.__layers: List[Layer] = []
+        self.__layerComponents = []
+        factory = LayerComponentFactory(i_theme, i_world)
         for name in i_world.layerNames:
-            layer = LayerComponent(i_theme, i_world, name)
-            self.addComponent(layer, cache=True)
+            layerComponent = factory.create(name)
+            self.addComponent(layerComponent, cache=True)
+            self.__layerComponents.append(layerComponent)
+
+            layer = i_world.getLayer(name)
+            layer.registerListener(self)
+            self.__layers.append(layer)
             
         # Get the tile size from the first layer's tileset
         self.__tileSize = i_theme.getTileset(i_world.layerNames[0]).tileSize
@@ -32,6 +41,12 @@ class WorldComponent(CompositeComponent, IUIEventHandler):
             return None
         return coords
     
+    # Layer listener
+
+    def cellChanged(self, i_layer: Layer, i_cell: Tuple[int, int]):
+        for layerComponent in self.__layerComponents:
+            layerComponent.cellChanged(i_layer, i_cell)
+
     # UI Event Handler methods
     def mouseButtonDown(self, i_mouse: Mouse) -> bool:
         """Handle mouse button press"""
@@ -69,3 +84,8 @@ class WorldComponent(CompositeComponent, IUIEventHandler):
         """Handle mouse leaving the component area"""
         self.__mouseButtonDown = False
         return True
+    
+    def setAutoTiling(self, i_enabled: bool):
+        """Set auto-tiling for all layer components."""
+        for component in self.__layerComponents:
+            component.autoTiling = i_enabled

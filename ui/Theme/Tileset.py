@@ -16,7 +16,7 @@ class Tileset:
         self.__tileSize = i_tileSize
         self.__imageFile = i_imageFile
         self.__surface: Optional[Surface] = None
-        self.__tilesRect: Dict[Union[int, str], Rect] = {}  # Value to rectangle mapping
+        self.__tilesRects: Dict[Union[int, str], List[Rect]] = {}  # Value to list of rectangles mapping
     
     @property
     def tileSize(self) -> Tuple[int, int]:
@@ -32,17 +32,38 @@ class Tileset:
     
     def addTile(self, i_value: Union[int, str], i_coords: Tuple[int, int]):
         """Register a tile at grid coordinates."""
-        self.__tilesRect[i_value] = Rect(
-                i_coords[0] * self.__tileSize[0],  # Grid to pixel conversion
-                i_coords[1] * self.__tileSize[1],
-                self.__tileSize[0], self.__tileSize[1]
-            )
-    
-    def getTileRect(self, i_value: Union[int, str]) -> Rect:
-        """Get rectangle for a tile value."""
-        if i_value not in self.__tilesRect:
+        if i_value not in self.__tilesRects:
+            self.__tilesRects[i_value] = []
+        
+        self.__tilesRects[i_value].append(Rect(
+            i_coords[0] * self.__tileSize[0],
+            i_coords[1] * self.__tileSize[1],
+            self.__tileSize[0], self.__tileSize[1]
+        ))
+
+    def addTiles(self, i_tilesDefs: Dict[Union[int, str], Union[List[Tuple[int, int]], Tuple[int, int]]]):
+        """Add multiple tiles to the tileset.
+        """
+        for i_value, i_coords in i_tilesDefs.items():
+            if isinstance(i_coords, list):
+                for i_coord in i_coords:
+                    self.addTile(i_value, i_coord)
+            elif isinstance(i_coords, tuple):
+                self.addTile(i_value, i_coords)
+            else:
+                raise ValueError(f"Invalid coordinates {i_coords}")
+
+    def getTileRect(self, i_value: Union[int, str]) -> Union[Rect, List[Rect]]:
+        """Get rectangle(s) for a tile value."""
+        if i_value not in self.__tilesRects:
             raise ValueError(f"No {i_value} in tileset {self.__imageFile}")
-        return self.__tilesRect[i_value]
+        return self.__tilesRects[i_value][0]
+    
+    def getTileRects(self, i_value: Union[int, str]) -> List[Rect]:
+        """Get all rectangles for a specific tile value."""
+        if i_value not in self.__tilesRects:
+            raise ValueError(f"No {i_value} in tileset {self.__imageFile}")
+        return self.__tilesRects[i_value]
     
     def getTile(self, i_value: Union[int, str]) -> Surface:
         """Get a surface for a specific tile."""
@@ -53,8 +74,10 @@ class Tileset:
     
     def getTilesId(self) -> List[Union[int, str]]:
         """Get all tile IDs in this tileset."""
-        return list(self.__tilesRect.keys())
+        return list(self.__tilesRects.keys())
     
-    def getTilesRect(self) -> Dict[Union[int, str], Rect]:
+    def getTilesRect(self) -> Dict[Union[int, str], List[Rect]]:
         """Get all tile rectangles."""
-        return self.__tilesRect
+        return {value: tileRects[0] for value, tileRects in self.__tilesRects.items()}
+    
+    

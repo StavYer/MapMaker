@@ -1,4 +1,5 @@
 import random
+import pygame
 from typing import Tuple, Union
 
 
@@ -53,9 +54,19 @@ class EditGameMode(GameMode, IComponentListener):
         self.__paletteFrame.removeListener(self)
         super().dispose()
         
-    
-
-   
+    def keyDown(self, i_key: int) -> bool:
+        """Handle key press event."""
+        if i_key == pygame.K_F1:
+            # Enable auto-tiling
+            print("Auto-tiling enabled")
+            self.__worldComponent.setAutoTiling(True)
+            return True
+        elif i_key == pygame.K_F2:
+            # Disable auto-tiling
+            print("Auto-tiling disabled")
+            self.__worldComponent.setAutoTiling(False)
+            return True
+        return False
 
     # Component Listener methods
     def __updateCell(self, i_cell: Tuple[int, int], i_mouse: Mouse):
