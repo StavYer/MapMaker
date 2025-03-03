@@ -8,6 +8,7 @@ from tools.vector import vectorDivF
 from ui.IUIEventHandler import IUIEventHandler
 from ui.Mouse import Mouse
 from ui.MouseWheel import MouseWheel
+from ui.component.Component import Component  # Added Component import
 from ui.mode.GameMode import GameMode
 from ui.theme.Theme import Theme
 
@@ -28,8 +29,8 @@ class UserInterface:
         self.__renderSize = (self.__window.get_width(), self.__window.get_height())
         self.__font = theme.getFont("default")
         
-        # Input handling
-        self.__mouseFocus = False
+        # Input handling - changed from boolean to Component
+        self.__mouseFocus: Optional[Component] = None
         
         # Game properties
         self.__gameMode: Optional[GameMode] = None
@@ -53,6 +54,15 @@ class UserInterface:
         return [mode for mode in [
             self.__gameMode
         ] if mode is not None]
+    
+    # New method to find which component should have mouse focus
+    def findMouseFocus(self, mouse: Mouse) -> Optional[Component]:
+        """Find component that should receive mouse focus"""
+        for handler in self.getEventHandlers():
+            focus = handler.findMouseFocus(mouse)
+            if focus is not None:
+                return focus
+        return None
     
     # Event handling methods
     def handleKeyDown(self, key: int) -> bool:
@@ -111,6 +121,30 @@ class UserInterface:
                 return True
         return False
     
+    def __createMouse(self) -> Mouse:
+        """Create a Mouse object from current mouse position"""
+        mouseX, mouseY = pygame.mouse.get_pos()
+        mouseX = int((mouseX - self.__rescaledShift[0]) / self.__rescaledScale[0])
+        mouseY = int((mouseY - self.__rescaledShift[1]) / self.__rescaledScale[1])
+        pygameButtons = pygame.mouse.get_pressed(num_buttons=3)
+        return Mouse((mouseX, mouseY), pygameButtons)
+    
+    def __updateMouseFocus(self):
+        """Update which component has mouse focus"""
+        if pygame.mouse.get_focused():
+            mouse = self.__createMouse()
+            newFocus = self.findMouseFocus(mouse)
+        else:
+            mouse = Mouse((-10000, -10000))
+            newFocus = None
+            
+        if newFocus != self.__mouseFocus:
+            if self.__mouseFocus is not None and isinstance(self.__mouseFocus, IUIEventHandler):
+                self.__mouseFocus.mouseLeave()
+            self.__mouseFocus = newFocus
+            if self.__mouseFocus is not None and isinstance(self.__mouseFocus, IUIEventHandler):
+                self.__mouseFocus.mouseEnter(mouse)
+    
     def __processKeyEvent(self, event):
         """Process keyboard events"""
         if event.type == pygame.KEYDOWN:
@@ -120,26 +154,10 @@ class UserInterface:
     
     def __processMouseEvent(self, event):
         """Process mouse events"""
-        if event.type == pygame.ACTIVEEVENT:
-            if event.gain == 0 and self.__mouseFocus:
-                self.__mouseFocus = False
-                self.handleMouseLeave()
-            return
+        mouse = self.__createMouse()
+        viewSize = self.__theme.viewSize
         
-        # Convert mouse coordinates
-        mouseX, mouseY = pygame.mouse.get_pos()
-        mouseX = int((mouseX - self.__rescaledShift[0]) / self.__rescaledScale[0])
-        mouseY = int((mouseY - self.__rescaledShift[1]) / self.__rescaledScale[1])
-        pygameButtons = pygame.mouse.get_pressed(num_buttons=3)
-        mouse = Mouse((mouseX, mouseY), pygameButtons)
-        
-        # Check if mouse is in render area
-        if 0 <= mouseX < self.__renderSize[0] and 0 <= mouseY < self.__renderSize[1]:
-            if not self.__mouseFocus:
-                self.__mouseFocus = True
-                self.handleMouseEnter(mouse)
-            
-            # Process specific mouse events
+        if 0 <= mouse.coords[0] < viewSize[0] and 0 <= mouse.coords[1] < viewSize[1]:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.handleMouseButtonDown(mouse)
             elif event.type == pygame.MOUSEBUTTONUP:
@@ -149,9 +167,6 @@ class UserInterface:
                 self.handleMouseWheel(mouse, wheel)
             elif event.type == pygame.MOUSEMOTION:
                 self.handleMouseMove(mouse)
-        elif self.__mouseFocus:
-            self.__mouseFocus = False
-            self.handleMouseLeave()
     
     def processInput(self):
         """Process all input events"""
@@ -164,11 +179,12 @@ class UserInterface:
                     self.__running = False
                     break
                 self.__processKeyEvent(event)
-            elif event.type == pygame.ACTIVEEVENT:
-                self.__processMouseEvent(event)
             elif event.type in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, 
                                pygame.MOUSEWHEEL, pygame.MOUSEMOTION):
                 self.__processMouseEvent(event)
+        
+        # Update mouse focus after processing all events
+        self.__updateMouseFocus()
     
     def update(self):
         """Update game state"""
@@ -178,13 +194,14 @@ class UserInterface:
     def render(self):
         """Render the game"""
         # Render to a surface
-        renderSurface = Surface(self.__renderSize)
+        renderSurface = Surface(self.__theme.viewSize)
         if self.__gameMode is not None:
             self.__gameMode.render(renderSurface)
         
         # Scale the rendered surface to fit the window
         windowWidth, windowHeight = self.__window.get_size()
-        renderRatio = self.__renderSize[0] / self.__renderSize[1]
+        viewSize = self.__theme.viewSize
+        renderRatio = viewSize[0] / viewSize[1]
         windowRatio = windowWidth / windowHeight
         
         if windowRatio <= renderRatio:

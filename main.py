@@ -16,9 +16,10 @@ for y in range(0, world.height):
 
 # Create a user interface object and run it
 theme = Theme()
+theme.viewSize = (world.width * 16, world.height * 16)
 user_interface = UserInterface(theme)
 gameMode = EditGameMode(theme, world)
 user_interface.setGameMode(gameMode)
-user_interface.setRenderSize(world.width * 16, world.height * 16)
+
 user_interface.run()
 user_interface.quit()

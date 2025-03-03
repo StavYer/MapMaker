@@ -1,8 +1,8 @@
 # ui/Mouse.py
-from typing import Tuple
+from typing import Tuple, Union
 
 class Mouse:
-    def __init__(self, coords: Tuple[int, int], buttons: Tuple[bool, bool, bool]):
+    def __init__(self, coords: Tuple[int, int], buttons: Union[Tuple[bool, bool, bool], Tuple[bool, bool, bool, bool, bool]] = (False, False, False)):
         # Initialize the Mouse object with coordinates and button states.
         self.coords = coords
         self.buttons = buttons

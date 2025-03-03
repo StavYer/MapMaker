@@ -45,7 +45,7 @@ class FrameComponent(CompositeComponent, IUIEventHandler):
         y2b = y1 + height - tileHeight
         
         # Get tileset surface
-        tilesetSurface = self.__tileset.getSurface()
+        tilesetSurface = self.__tileset.surface
         
         # Draw corners
         i_surface.blit(tilesetSurface, (x1, y1), self.__topLeftTile)

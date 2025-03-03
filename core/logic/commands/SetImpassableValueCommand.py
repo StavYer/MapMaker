@@ -49,7 +49,7 @@ class SetImpassableValueCommand(SetLayerValueCommand):
         impassable.set_cell_value(coords[0], coords[1], value)
         impassable.notifyCellChanged(coords)
         # If fill is enabled, recursively add commands for adjacent cells
-        if hasattr(self, '_fill') and self._fill:
+        if self._fill:
             x, y = coords[0], coords[1]
             i_logic.addCommand(SetImpassableValueCommand((x + 1, y), value, True))
             i_logic.addCommand(SetImpassableValueCommand((x - 1, y), value, True))

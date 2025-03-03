@@ -16,6 +16,7 @@ from .Tileset import Tileset
 
 class Theme:
     def __init__(self):
+        self.__viewSize = (1024, 768)
         # Initialize caches for image surfaces and tilesets.
         self.__surfaces: Dict[str, Surface] = {}
         self.__tilesets: Dict[str, Tileset] = {}
@@ -127,6 +128,7 @@ tilesDefs = {
         "imageFile": "toen/impassable.png",
         "tileSize": (16, 16),
         "tiles": {
+            CellValue.NONE: (0, 0),
             CellValue.IMPASSABLE_RIVER: (0, 1),
             CellValue.IMPASSABLE_POND: (1, 0),
             CellValue.IMPASSABLE_MOUNTAIN: (4, 0),
@@ -136,6 +138,7 @@ tilesDefs = {
         "imageFile": "toen/objects.png",
         "tileSize": (16, 16),
         "tiles": {
+            CellValue.NONE: (0, 0),
             CellValue.OBJECTS_SIGN: (1, 0),
             CellValue.OBJECTS_HILL: (4, 0),
             CellValue.OBJECTS_ROCKS: (6, 1),
@@ -146,6 +149,22 @@ tilesDefs = {
             CellValue.OBJECTS_ROAD_STONE: (4, 3),
             CellValue.OBJECTS_FARM: (8, 0),
             CellValue.OBJECTS_CAMP: (8, 1),
+        }
+    },
+    "frame": {
+    "imageFile": "toen/frame.png",
+    "tileSize": (4, 4),
+    "tiles": {
+        "none": (0, 0),
+        "topLeft": (0, 1),
+        "top": (1, 1),
+        "topRight": (2, 1),
+        "left": (0, 2),
+        "center": (1, 2),
+        "right": (2, 2),
+        "bottomLeft": (0, 3),
+        "bottom": (1, 3),
+        "bottomRight": (2, 3),
         },
     },
 }

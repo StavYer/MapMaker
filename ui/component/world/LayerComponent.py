@@ -37,7 +37,7 @@ class LayerComponent(Component, ILayerListener):
     def render(self, i_surface: Surface):
         """Render the layer to the provided surface."""
         # Get the tileset image surface.
-        tileset = self.__tileset.getSurface()
+        tileset = self.__tileset.surface
         # Retrieve tile dimensions.
         tileWidth, tileHeight = self.__tileset.tileSize
         # Obtain the mapping from cell values to tile rectangles.

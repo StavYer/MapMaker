@@ -51,11 +51,11 @@ class PaletteFrame(FrameComponent):
             # Position the button relative to the frame or previous buttons
             if i_columnButton is None:
                 i_columnButton = button
-                button.moveRelativeTo("topLeft", self, "topLeft", borderSize=0)
+                button.moveRelativeTo("topLeft", self, "topLeft", i_borderSize=0)
             elif columnIndex == 0:
-                button.moveRelativeTo("left", i_columnButton, "right", borderSize=0)
+                button.moveRelativeTo("left", i_columnButton, "right", i_borderSize=0)
             else:
-                button.moveRelativeTo("top", previousButton, "bottom", borderSize=0)
+                button.moveRelativeTo("top", previousButton, "bottom", i_borderSize=0)
             
             # Add the button to the frame
             self.addComponent(button)
