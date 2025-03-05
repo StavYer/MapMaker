@@ -82,5 +82,37 @@ class Tileset:
 
     def getTilesRects(self) -> Dict[Union[int, str], List[Rect]]:
         return self.__tilesRects
-    
-    
+
+    def getCode4Rects(self, i_shiftX: int, i_shiftY: int) -> List[Rect]:
+        """Create lookup table of rectangles for 4-connected tiles"""
+        code2rect = []
+        tileWidth, tileHeight = self.tileSize
+        for code in range(16):
+            tile = tilecodes4[code]
+            code2rect.append(Rect(
+                (tile[0] + i_shiftX) * tileWidth,
+                (tile[1] + i_shiftY) * tileHeight,
+                tileWidth, tileHeight
+            ))
+        return code2rect
+
+    def getCode8Rects(self, i_shiftX: int, i_shiftY: int) -> List[Rect]:
+        """Create lookup table of rectangles for 8-connected tiles with simplification"""
+        code2rect = []
+        tileWidth, tileHeight = self.tileSize
+        for code in range(256):
+            if code in tilecodes8:
+                tile = tilecodes8[code]
+            else:
+                # Simplify code if no direct mapping exists
+                mask = decode8(code)
+                mask = simplify8(mask)
+                simplified_code = code8(mask)
+                tile = tilecodes8[simplified_code]
+            code2rect.append(Rect(
+                (tile[0] + i_shiftX) * tileWidth,
+                (tile[1] + i_shiftY) * tileHeight,
+                tileWidth, tileHeight
+            ))
+        return code2rect
+
