@@ -27,6 +27,11 @@ class SetImpassableValueCommand(SetLayerValueCommand):
             # If the value to set is NONE, ensure it is not already NONE
             if impassableValue == CellValue.NONE:  # Value already removed
                 return False
+            objectsValue = world.objects.get_cell_value(coords)
+            # If we have a bridge, don't remove river
+            if impassableValue == CellValue.IMPASSABLE_RIVER \
+                and objectsValue in [CellValue.OBJECTS_ROAD_DIRT, CellValue.OBJECTS_ROAD_STONE]:
+                return False
         else:
             # If the value to set is not NONE, ensure it is not already set
             if impassableValue != CellValue.NONE:  # Value already set

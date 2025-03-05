@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from core.constants import CellValue, checkCellValue
+from tools.tilecodes import mask4, code4
 from .SetLayerValueCommand import SetLayerValueCommand
 if TYPE_CHECKING:
     from ..Logic import Logic
@@ -29,11 +30,30 @@ class SetObjectsValueCommand(SetLayerValueCommand):
             # If setting value, ensure it is not already set
             if objectsValue != CellValue.NONE:
                 return False
-            # Ensure the cell is not sea or impassable terrain
+
+            # Ensure the cell is not sea
             if world.ground.get_cell_value((coords[0], coords[1])) == CellValue.GROUND_SEA:
                 return False
-            if world.impassable.get_cell_value((coords[0], coords[1])) != CellValue.NONE:
-                return False
+
+            impassableLayer = world.impassable
+            impassableValue = impassableLayer.get_cell_value((coords[0], coords[1]))
+
+            # If we have a river
+            if impassableValue == CellValue.IMPASSABLE_RIVER:
+                # Value must be a road type
+                if value not in [CellValue.OBJECTS_ROAD_DIRT, CellValue.OBJECTS_ROAD_STONE]:
+                    return False
+                
+                neighbors = impassableLayer.getNeighbors4(coords)
+                mask = mask4(neighbors, CellValue.IMPASSABLE_RIVER)
+                code = code4(mask)
+                # If not horizontal or vertical river
+                if code not in [6,9]:
+                    return False
+            else:
+                # In the general case, can't build if value already set
+                if impassableValue != CellValue.NONE:
+                    return False
 
         return True
 

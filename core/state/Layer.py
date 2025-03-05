@@ -109,4 +109,5 @@ class Layer(Listenable[ILayerListener]):
         bottom_left = self.__cells[y + 1][x - 1] if x > 0 and y < h else self.__defaultValue
         bottom_right = self.__cells[y + 1][x + 1] if x < w and y < h else self.__defaultValue
         
-        return top_left, top, top_right, left, right, bottom_left, bottom, bottom_right
+        return (top_left, left, bottom_left, top,
+                bottom, top_right, right, bottom_right)
