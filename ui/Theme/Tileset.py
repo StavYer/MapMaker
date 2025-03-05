@@ -4,6 +4,9 @@ import pygame
 from pygame.rect import Rect
 from pygame.surface import Surface
 
+from tools.tilecodes import tilecodes4, decode8, simplify8, code8
+from tools.tilecodes import tilecodes8
+
 # Avoid circular imports
 if TYPE_CHECKING:
     from .Theme import Theme
@@ -53,10 +56,8 @@ class Tileset:
             else:
                 raise ValueError(f"Invalid coordinates {i_coords}")
 
-    def getTileRect(self, i_value: Union[int, str]) -> Union[Rect, List[Rect]]:
+    def getTileRect(self, i_value: Union[int, str]) -> Rect:
         """Get rectangle(s) for a tile value."""
-        if i_value not in self.__tilesRects:
-            raise ValueError(f"No {i_value} in tileset {self.__imageFile}")
         return self.__tilesRects[i_value][0]
     
     def getTileRects(self, i_value: Union[int, str]) -> List[Rect]:

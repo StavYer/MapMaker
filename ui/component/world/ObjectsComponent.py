@@ -44,11 +44,11 @@ class ObjectsComponent(LayerComponent):
                 if self.autoTiling:
                     if value in [CellValue.OBJECTS_ROAD_DIRT, CellValue.OBJECTS_ROAD_STONE]:
                         # Check for bridge case (road over river)
-                        impassableValue = self.__impassableLayer.getValue((x, y))
+                        impassableValue = self.__impassableLayer.get_cell_value((x, y))
                         if impassableValue == CellValue.IMPASSABLE_RIVER:
                             # Check if the river is horizontal
-                            left = self.__impassableLayer.getValue((x - 1, y))
-                            right = self.__impassableLayer.getValue((x + 1, y))
+                            left = self.__impassableLayer.get_cell_value((x - 1, y))
+                            right = self.__impassableLayer.get_cell_value((x + 1, y))
                             riverHorizontal = (left == CellValue.IMPASSABLE_RIVER) and (right == CellValue.IMPASSABLE_RIVER)
                             
                             # Select appropriate bridge tile

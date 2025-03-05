@@ -22,7 +22,7 @@ class SetImpassableValueCommand(SetLayerValueCommand):
         if not world.contains(coords):
             return False
 
-        impassableValue = world.impassable.get_cell_value(coords[0], coords[1])
+        impassableValue = world.impassable.get_cell_value((coords[0], coords[1]))
         if value == CellValue.NONE:
             # If the value to set is NONE, ensure it is not already NONE
             if impassableValue == CellValue.NONE:  # Value already removed
@@ -32,10 +32,10 @@ class SetImpassableValueCommand(SetLayerValueCommand):
             if impassableValue != CellValue.NONE:  # Value already set
                 return False
             # Ensure the ground cell is not SEA
-            if world.ground.get_cell_value(coords[0], coords[1]) == CellValue.GROUND_SEA:
+            if world.ground.get_cell_value((coords[0], coords[1])) == CellValue.GROUND_SEA:
                 return False
             # Ensure there are no objects in the cell
-            if world.objects.get_cell_value(coords[0], coords[1]) != CellValue.NONE:
+            if world.objects.get_cell_value((coords[0], coords[1])) != CellValue.NONE:
                 return False
 
         return True

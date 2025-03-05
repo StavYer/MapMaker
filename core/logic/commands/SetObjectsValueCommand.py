@@ -20,7 +20,7 @@ class SetObjectsValueCommand(SetLayerValueCommand):
         if not world.contains(coords):
             return False
         
-        objectsValue = world.objects.get_cell_value(coords[0], coords[1])
+        objectsValue = world.objects.get_cell_value((coords[0], coords[1]))
         if value == CellValue.NONE:
             # If removing value, ensure it is already removed
             if objectsValue == CellValue.NONE:
@@ -30,9 +30,9 @@ class SetObjectsValueCommand(SetLayerValueCommand):
             if objectsValue != CellValue.NONE:
                 return False
             # Ensure the cell is not sea or impassable terrain
-            if world.ground.get_cell_value(coords[0], coords[1]) == CellValue.GROUND_SEA:
+            if world.ground.get_cell_value((coords[0], coords[1])) == CellValue.GROUND_SEA:
                 return False
-            if world.impassable.get_cell_value(coords[0], coords[1]) != CellValue.NONE:
+            if world.impassable.get_cell_value((coords[0], coords[1])) != CellValue.NONE:
                 return False
 
         return True

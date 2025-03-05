@@ -125,6 +125,10 @@ tilesDefs = {
             CellValue.IMPASSABLE_RIVER: (0, 1),
             CellValue.IMPASSABLE_POND: [(1, 0), (2, 0), (3, 0)],
             CellValue.IMPASSABLE_MOUNTAIN: [(4, 0), (5, 0), (6, 0)],
+            "riverMouthRight": (4, 1),
+            "riverMouthLeft": (4, 2),
+            "riverMouthTop": (4, 3),
+            "riverMouthBottom": (4, 4),
         }
     },
     "objects": {
@@ -142,22 +146,25 @@ tilesDefs = {
             CellValue.OBJECTS_ROAD_STONE: (4, 3),
             CellValue.OBJECTS_FARM: [(8, 0), (9, 0), (10, 0), (11, 0)],
             CellValue.OBJECTS_CAMP: (8, 1),
-        }
+            "bridgeDirt": [(0, 7), (1, 7)],
+            "bridgeStone": [(4, 7), (5, 7)],
+        },
     },
     "frame": {
-    "imageFile": "toen/frame.png",
-    "tileSize": (4, 4),
-    "tiles": {
-        "none": (0, 0),
-        "topLeft": (0, 1),
-        "top": (1, 1),
-        "topRight": (2, 1),
-        "left": (0, 2),
-        "center": (1, 2),
-        "right": (2, 2),
-        "bottomLeft": (0, 3),
-        "bottom": (1, 3),
-        "bottomRight": (2, 3),
+        "imageFile": "toen/frame.png",
+        "tileSize": (4, 4),
+        "tiles": {
+            "none": (0, 0),
+            "topLeft": (0, 1),
+            "top": (1, 1),
+            "topRight": (2, 1),
+            "left": (0, 2),
+            "center": (1, 2),
+            "right": (2, 2),
+            "bottomLeft": (0, 3),
+            "bottom": (1, 3),
+            "bottomRight": (2, 3),
         },
     },
 }
+

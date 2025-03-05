@@ -2,6 +2,7 @@
 from typing import Optional, Union
 
 from core.state import World
+from core.constants.CellValue import getCellValues
 from ui.Mouse import Mouse
 from ui.theme.Theme import Theme
 from ui.component.control.Button import Button
@@ -45,7 +46,7 @@ class PaletteFrame(FrameComponent):
         columnIndex = 0
         
         # Iterate through each tile ID in the tileset
-        for tileId in tileset.getTilesId():
+        for tileId in getCellValues(i_layerName):
             button = self.__createButton(i_layerName, tileId)
             
             # Position the button relative to the frame or previous buttons

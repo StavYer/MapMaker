@@ -41,10 +41,10 @@ class ImpassableComponent(LayerComponent):
                 if self.autoTiling:
                     if i_value == CellValue.NONE:
                         # Check for sea connections in the ground layer
-                        i_groundValue = self.__ground.getValue((i_x, i_y))
+                        i_groundValue = self.__ground.get_cell_value((i_x, i_y))
                         if i_groundValue == CellValue.GROUND_SEA:
                             for i_direction in directions:
-                                if self.layer.getValue((i_x, i_y), i_direction) == CellValue.IMPASSABLE_RIVER:
+                                if self.layer.get_cell_value((i_x, i_y), i_direction) == CellValue.IMPASSABLE_RIVER:
                                     i_rect = self.__riverMouth[i_direction]
                                     i_surface.blit(i_tileset, i_tile, i_rect)
                     elif i_value == CellValue.IMPASSABLE_RIVER:

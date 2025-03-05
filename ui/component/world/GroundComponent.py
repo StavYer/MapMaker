@@ -11,6 +11,7 @@ class GroundComponent(LayerComponent):
     def __init__(self, i_theme: Theme, i_world: World):
         # Initialize the GroundComponent with theme and world
         super().__init__(i_theme, i_world, "ground")
+        self.__code2rect = self.tileset.getCode8Rects(0, 0)
 
     def render(self, i_surface: Surface):
         # Render the ground layer on the given surface

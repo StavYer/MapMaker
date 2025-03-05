@@ -23,7 +23,7 @@ class SetGroundValueCommand(SetLayerValueCommand):
         if not world.contains(coords):
             return False
 
-        groundValue = world.ground.get_cell_value(coords[0], coords[1])
+        groundValue = world.ground.get_cell_value((coords[0], coords[1]))
         
         # Check if the ground value is already set to the desired value
         if value == groundValue:
@@ -32,11 +32,11 @@ class SetGroundValueCommand(SetLayerValueCommand):
         # Additional checks if setting the value to sea, since we don't want to set
         # a sea with an object or impassable value
         if value == CellValue.GROUND_SEA:
-            impassableValue = world.impassable.get_cell_value(coords[0], coords[1])
+            impassableValue = world.impassable.get_cell_value((coords[0], coords[1]))
             if impassableValue != CellValue.NONE:
                 return False
 
-            objectsValue = world.objects.get_cell_value(coords[0], coords[1])
+            objectsValue = world.objects.get_cell_value((coords[0], coords[1]))
             if objectsValue != CellValue.NONE:
                 return False
 

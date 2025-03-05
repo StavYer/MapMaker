@@ -15,6 +15,8 @@ class Layer(Listenable[ILayerListener]):
         # size of our Layer. Should be immutable.
         self.__width = input_width
         self.__height = input_height
+        self.__defaultValue = input_defaultValue
+        self.__size = (input_width, input_height)
         # Value of every cell of the Layer. Should be immutable.
         # A 2d matrix - each row has width columns (initialized to default value)
         # and we have height rows
@@ -23,7 +25,12 @@ class Layer(Listenable[ILayerListener]):
             row = [input_defaultValue] * input_width
             self.__cells.append(row)
     
+    
     # Getter properties
+    @property
+    def size(self) -> Tuple[int, int]:
+        return self.__size
+
     @property
     def width(self) -> int:
         return self.__width
@@ -33,7 +40,7 @@ class Layer(Listenable[ILayerListener]):
         return self.__height
 
     def __getitem__(self, coords: Tuple[int, int]) -> CellValue:
-        return self.get_cell_value(coords[0], coords[1])
+        return self.get_cell_value((coords[0], coords[1]))
     
     def __setitem__(self, coords: Tuple[int, int], value: CellValue):
         self.set_cell_value(coords[0],coords[1], value)

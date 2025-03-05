@@ -1,4 +1,5 @@
 from enum import IntEnum
+from typing import List
 
 class CellValue(IntEnum):
     NONE = 0
@@ -26,6 +27,14 @@ CellValueRanges = {
     "objects": (301, 311)
 }
 
+def getCellValues(i_layer: str) -> List[int]:
+    values: List[int] = []
+    if i_layer != "ground":
+        values.append(CellValue.NONE)
+    for value in range(*CellValueRanges[i_layer]):
+        values.append(value)
+    return values
+
 def checkCellValue(layer: str, value: CellValue):
     """
     Checks if the given cell value is valid for the specified layer.
@@ -35,4 +44,9 @@ def checkCellValue(layer: str, value: CellValue):
     
     # check if whithin the range
     valueRange = CellValueRanges[layer]
-    return valueRange[0] <= value < valueRange[1]
+    try:
+        return valueRange[0] <= value < valueRange[1]
+    except Exception as e:
+        print(f"this is value: {value}")
+        print(f"Error: {e}")
+        
