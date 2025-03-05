@@ -1,39 +1,70 @@
 from pygame import Surface
 
-from core.constants import CellValue
+from core.constants import CellValue, Direction, directions
 from core.state import World
+from tools.tilecodes import mask4, combine4, code4
 from .LayerComponent import LayerComponent
 from ...theme.Theme import Theme
 
 
 class ImpassableComponent(LayerComponent):
+    """Component that renders impassable terrain features"""
+
     def __init__(self, i_theme: Theme, i_world: World):
-        # Initialize the parent class with theme, world, and layer name "impassable"
+        """Initialize the impassable layer renderer"""
         super().__init__(i_theme, i_world, "impassable")
+# Get the ground layer to check for sea connections
+        self.__ground = i_world.getLayer("ground")
+        # Get lookup table for 4-connected river tiles
+        self.__river_code2rect = self.tileset.getCode4Rects(0, 1)
+        # Get river mouth tiles (where rivers connect to sea)
+        self.__riverMouth = {
+            Direction.LEFT: self.tileset.getTileRect("riverMouthLeft"),
+            Direction.RIGHT: self.tileset.getTileRect("riverMouthRight"),
+            Direction.TOP: self.tileset.getTileRect("riverMouthTop"),
+            Direction.BOTTOM: self.tileset.getTileRect("riverMouthBottom"),
+        }
 
     def render(self, i_surface: Surface):
-        # Call the parent class render method
+        """Render the impassable terrain features on the given surface"""
         super().render(i_surface)
-        tileset = self.tileset.surface
-        tilesRects = self.tileset.getTilesRects()
-        tileWidth, tileHeight = self.tileset.tileSize
+        i_tileset = self.tileset.surface
+        i_tilesRects = self.tileset.getTilesRects()
+        i_tileWidth, i_tileHeight = self.tileset.tileSize
         
         # Iterate over each cell in the layer
-        for y in range(self.layer.height):
-            for x in range(self.layer.width):
-                value = self.layer[x, y]
-                if value == CellValue.NONE:
-                    continue  # Skip if the cell value is NONE
-                
-                tile = (x * tileWidth, y * tileHeight)
+        for i_y in range(self.layer.height):
+            for i_x in range(self.layer.width):
+                i_value = self.layer[i_x, i_y]
+                i_tile = (i_x * i_tileWidth, i_y * i_tileHeight)
                 
                 if self.autoTiling:
-                    # Auto-tiling logic
-                    rects = tilesRects[value]
-                    tileCount = len(rects)
-                    rectIndex = self.noise[y][x] % tileCount
-                    i_surface.blit(tileset, tile, rects[rectIndex])
-                else:
-                    # Default tiling logic
-                    rects = tilesRects[value]
-                    i_surface.blit(tileset, tile, rects[0])
+                    if i_value == CellValue.NONE:
+                        # Check for sea connections in the ground layer
+                        i_groundValue = self.__ground.getValue((i_x, i_y))
+                        if i_groundValue == CellValue.GROUND_SEA:
+                            for i_direction in directions:
+                                if self.layer.getValue((i_x, i_y), i_direction) == CellValue.IMPASSABLE_RIVER:
+                                    i_rect = self.__riverMouth[i_direction]
+                                    i_surface.blit(i_tileset, i_tile, i_rect)
+                    elif i_value == CellValue.IMPASSABLE_RIVER:
+                        # Determine the appropriate river tile based on neighbors
+                        i_neighbors = self.layer.getNeighbors4((i_x, i_y))
+                        i_mask = mask4(i_neighbors, CellValue.IMPASSABLE_RIVER)
+                        i_mask = combine4(i_mask, mask4(i_neighbors, CellValue.IMPASSABLE_MOUNTAIN))
+                        i_neighbors = self.__ground.getNeighbors4((i_x, i_y))
+                        i_mask = combine4(i_mask, mask4(i_neighbors, CellValue.GROUND_SEA))
+                        i_code = code4(i_mask)
+                        i_rect = self.__river_code2rect[i_code]
+                        i_surface.blit(i_tileset, i_tile, i_rect)
+                    else:
+                        # Render other impassable features
+                        i_rects = i_tilesRects[i_value]
+                        i_tileCount = len(i_rects)
+                        i_rectIndex = self.noise[i_y][i_x] % i_tileCount
+                        i_rect = i_rects[i_rectIndex]
+                        i_surface.blit(i_tileset, i_tile, i_rect)
+                elif i_value != CellValue.NONE:
+                    # Render non-auto-tiling impassable features
+                    i_rects = i_tilesRects[i_value]
+                    i_surface.blit(i_tileset, i_tile, i_rects[0])

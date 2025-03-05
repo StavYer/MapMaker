@@ -2,6 +2,7 @@ from pygame import Surface
 
 from core.constants import CellValue
 from core.state import World
+from tools.tilecodes import mask8, code8
 from .LayerComponent import LayerComponent
 from ...theme.Theme import Theme
 
@@ -33,6 +34,14 @@ class GroundComponent(LayerComponent):
                     tileCount = len(rects)
                     rectIndex = self.noise[y][x] % tileCount
                     i_surface.blit(tileset, tile, rects[rectIndex])
+
+                    # Add border tiles for sea
+                    if value == CellValue.GROUND_SEA:
+                        neighbors = self.layer.getNeighbors8((x, y))
+                        mask = mask8(neighbors, CellValue.GROUND_SEA)
+                        code = code8(mask)
+                        rect = self.__code2rect[code]
+                        i_surface.blit(tileset, tile, rect)
                 else:
                     # Default tiling logic
                     rects = tilesRects[value]
