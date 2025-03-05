@@ -1,9 +1,10 @@
 # core/state/Layer.py
-from typing import Tuple
+from typing import Tuple, Optional
 
 from ..Listenable import Listenable
 from .ILayerListener import ILayerListener
 from ..constants.CellValue import CellValue
+from core.constants.Direction import Direction
 
 
 class Layer(Listenable[ILayerListener]):
@@ -38,12 +39,29 @@ class Layer(Listenable[ILayerListener]):
         self.set_cell_value(coords[0],coords[1], value)
 
     # Getter and Setter for a single cell's value
-    def get_cell_value(self, input_x: int, input_y: int) -> CellValue:
-        # Assert that the coordinates are at between proper limits, otherwise notify
-        assert 0 <= input_x < self.__width, f"invalid cell x coordinate: {input_x}"
-        assert 0 <= input_y < self.__height, f"invalid cell y coordinate: {input_y}"
-
-        return self.__cells[input_y][input_x]
+    def get_cell_value(self, i_coords: Tuple[int, int], i_direction: Optional[Direction] = None) -> int:
+        """Get cell value with optional direction parameter"""
+        x, y = i_coords[0], i_coords[1]
+        if i_direction:
+            # Check direction and return the corresponding neighbor's value
+            if i_direction == Direction.LEFT:
+                if x < 1:
+                    return self.__defaultValue
+                return self.__cells[y][x - 1]
+            if i_direction == Direction.TOP:
+                if y < 1:
+                    return self.__defaultValue
+                return self.__cells[y - 1][x]
+            if i_direction == Direction.RIGHT:
+                if x >= self.__size[0] - 1:
+                    return self.__defaultValue
+                return self.__cells[y][x + 1]
+            if i_direction == Direction.BOTTOM:
+                if y >= self.__size[1] - 1:
+                    return self.__defaultValue
+                return self.__cells[y + 1][x]
+        # Return the value of the cell at the given coordinates
+        return self.__cells[y][x]
 
     def set_cell_value(self, input_x: int, input_y: int, value: CellValue) -> None:
         # Same here
@@ -56,3 +74,32 @@ class Layer(Listenable[ILayerListener]):
         """Notify all listeners that a cell has changed."""
         for listener in self.listeners:
             listener.cellChanged(self, cell)
+
+    def getNeighbors4(self, i_cell: Tuple[int, int]) -> Tuple[int, int, int, int]:
+        """Get values of 4-connected neighbors (left, top, bottom, right)"""
+        x, y = i_cell
+        w, h = self.__size[0] - 1, self.__size[1] - 1
+        left = self.__cells[y][x - 1] if x > 0 else self.__defaultValue
+        top = self.__cells[y - 1][x] if y > 0 else self.__defaultValue
+        bottom = self.__cells[y + 1][x] if y < h else self.__defaultValue
+        right = self.__cells[y][x + 1] if x < w else self.__defaultValue
+        return left, top, bottom, right
+
+    def getNeighbors8(self, i_cell: Tuple[int, int]) -> Tuple[int, int, int, int, int, int, int, int]:
+        """Get values of 8-connected neighbors (includes diagonals)"""
+        x, y = i_cell
+        w, h = self.__size[0] - 1, self.__size[1] - 1
+        
+        # Get direct neighbors
+        left = self.__cells[y][x - 1] if x > 0 else self.__defaultValue
+        top = self.__cells[y - 1][x] if y > 0 else self.__defaultValue
+        bottom = self.__cells[y + 1][x] if y < h else self.__defaultValue
+        right = self.__cells[y][x + 1] if x < w else self.__defaultValue
+        
+        # Get diagonal neighbors
+        top_left = self.__cells[y - 1][x - 1] if x > 0 and y > 0 else self.__defaultValue
+        top_right = self.__cells[y - 1][x + 1] if x < w and y > 0 else self.__defaultValue
+        bottom_left = self.__cells[y + 1][x - 1] if x > 0 and y < h else self.__defaultValue
+        bottom_right = self.__cells[y + 1][x + 1] if x < w and y < h else self.__defaultValue
+        
+        return top_left, top, top_right, left, right, bottom_left, bottom, bottom_right
