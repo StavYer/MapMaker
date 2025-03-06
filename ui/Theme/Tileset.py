@@ -3,6 +3,7 @@ from typing import Dict, Tuple, TYPE_CHECKING, Union, Optional, List
 import pygame
 from pygame.rect import Rect
 from pygame.surface import Surface
+from pygame import Color
 
 from tools.tilecodes import tilecodes4, decode8, simplify8, code8
 from tools.tilecodes import tilecodes8
@@ -116,4 +117,18 @@ class Tileset:
                 tileWidth, tileHeight
             ))
         return code2rect
+
+    def getTilesColor(self, i_valueRange: Tuple[int, int]) -> Dict[int, Color]:
+        """Get the average colors of tiles within the given value range."""
+        colors = {}
+        for value in range(i_valueRange[0], i_valueRange[1]):
+            if value in self.__tilesRects:
+                rects = self.__tilesRects[value]
+                color = pygame.transform.average_color(self.surface, rects[0])
+                colors[value] = color
+            
+            else:
+                raise ValueError(f"No tile for value {value}")
+                
+        return colors
 

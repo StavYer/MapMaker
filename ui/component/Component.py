@@ -214,3 +214,8 @@ class Component(Listenable[IComponentListener]):
         """Notify all listeners that the secondary brush was selected."""
         for listener in self.listeners:
             listener.secondaryBrushSelected(i_layerName, i_value)
+
+    def notifyViewChanged(self, i_view: tuple[int, int]) -> None:
+        """Notify all listeners that the view position has changed."""
+        for listener in self.listeners:
+            listener.viewChanged(i_view)

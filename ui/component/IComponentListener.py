@@ -23,3 +23,7 @@ class IComponentListener(ABC):
     def secondaryBrushSelected(self, i_layerName: str, i_value: Union[int, str]) -> None:
         """Called when the secondary brush is selected."""
         pass
+        
+    def viewChanged(self, i_view: Tuple[int, int]) -> None:
+        """Called when the view position changes."""
+        pass
