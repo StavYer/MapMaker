@@ -185,6 +185,10 @@ class UserInterface:
         
         # Update mouse focus after processing all events
         self.__updateMouseFocus()
+        
+        # Process input in game mode
+        if self.__gameMode is not None:
+            self.__gameMode.processInput()
     
     def update(self):
         """Update game state"""

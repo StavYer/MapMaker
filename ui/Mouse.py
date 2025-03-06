@@ -1,33 +1,42 @@
 # ui/Mouse.py
-from typing import Tuple, Union
+from typing import Tuple
+
 
 class Mouse:
-    def __init__(self, coords: Tuple[int, int], buttons: Union[Tuple[bool, bool, bool], Tuple[bool, bool, bool, bool, bool]] = (False, False, False)):
-        # Initialize the Mouse object with coordinates and button states.
-        self.coords = coords
-        self.buttons = buttons
-
+    """Class representing mouse state"""
+    
+    def __init__(self, coords: Tuple[int, int], buttons: Tuple[bool, bool, bool] = (False, False, False)):
+        """
+        Initialize a mouse object
+        
+        Args:
+            coords: The (x, y) coordinates of the mouse
+            buttons: Tuple of (left, middle, right) button states
+        """
+        self.__coords = coords
+        self.__buttons = buttons
+    
     @property
-    def x(self) -> int:
-    # Get the x-coordinate of the mouse.
-        return self.coords[0]
-
+    def coords(self) -> Tuple[int, int]:
+        """Get mouse coordinates"""
+        return self.__coords
+    
     @property
-    def y(self) -> int:
-        # Get the y-coordinate of the mouse.
-        return self.coords[1]
-
+    def pixel(self) -> Tuple[int, int]:
+        """Get mouse coordinates (alias for backward compatibility)"""
+        return self.__coords
+    
     @property
     def button1(self) -> bool:
-        # Get the state of the first mouse button.
-        return self.buttons[0]
-
+        """Is left button pressed"""
+        return self.__buttons[0]
+    
     @property
     def button2(self) -> bool:
-        # Get the state of the second mouse button.
-        return self.buttons[1]
-
+        """Is middle button pressed"""
+        return self.__buttons[1]
+    
     @property
     def button3(self) -> bool:
-        # Get the state of the third mouse button.
-        return self.buttons[2]
+        """Is right button pressed"""
+        return self.__buttons[2]

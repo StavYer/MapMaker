@@ -48,7 +48,7 @@ class MinimapFrame(FrameComponent, ILayerListener):
         for y in range(worldHeight):
             for x in range(worldWidth):
                 for name, layer in layers:
-                    value = layer.getValue((x, y))
+                    value = layer.get_cell_value((x, y))
                     if value != CellValue.NONE:
                         color = self.__colors[name][value]
                         minimapSurface.set_at((x, y), color)

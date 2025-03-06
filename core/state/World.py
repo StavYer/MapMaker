@@ -1,10 +1,13 @@
 from .Layer import Layer
+from typing import Tuple
 from ..constants import CellValue
 class World:
     def __init__(self, input_width : int, input_height : int):
         # size of our world. Should be immutable.
         self.__width = input_width
         self.__height = input_height
+
+        self.__size = (input_width, input_height)
         
         # Initialize a dictionary of layers with default cell values
         self.__layers = {
@@ -14,6 +17,11 @@ class World:
         }
 
     # Getter properties
+
+    @property
+    def size(self) -> Tuple[int, int]:
+        return self.__size
+
     @property
     def width(self) -> int:
         return self.__width

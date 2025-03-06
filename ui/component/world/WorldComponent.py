@@ -1,7 +1,7 @@
-from typing import Tuple, Optional
+from typing import Tuple, Optional, List
 
 from core.state import World, Layer, ILayerListener
-from tools.vector import vectorDivI
+from tools.vector import vectorDivI, vectorAddI
 from ui.Mouse import Mouse
 from ui.theme.Theme import Theme
 from ui.IUIEventHandler import IUIEventHandler
@@ -15,6 +15,7 @@ class WorldComponent(CompositeComponent, IUIEventHandler, ILayerListener):
     def __init__(self, i_theme: Theme, i_world: World):
         super().__init__(i_theme)
         self.__world = i_world
+        self.__view = (0, 0)
         self.__previousCell: Optional[Tuple[int, int]] = None
         self.__mouseButtonDown = False
         
@@ -33,19 +34,33 @@ class WorldComponent(CompositeComponent, IUIEventHandler, ILayerListener):
             
         # Get the tile size from the first layer's tileset
         self.__tileSize = i_theme.getTileset(i_world.layerNames[0]).tileSize
+
+    def dispose(self):
+        for layer in self.__layers:
+            layer.removeListener(self)
+        super().dispose()
+
+    @property
+    def view(self) -> Tuple[int, int]:
+        return self.__view
     
     def __computeCellCoordinates(self, i_pixel: Tuple[int, int]) -> Optional[Tuple[int, int]]:
         """Convert pixel coordinates to cell coordinates"""
-        coords = vectorDivI(i_pixel, self.__tileSize)
-        if not self.__world.contains(coords):
+        pixel = vectorAddI(i_pixel, self.__view)
+        cell = vectorDivI(pixel, self.__tileSize)
+        if not self.__world.contains(cell):
             return None
-        return coords
+        return cell
     
     # Layer listener
-
     def cellChanged(self, i_layer: Layer, i_cell: Tuple[int, int]):
         for layerComponent in self.__layerComponents:
             layerComponent.cellChanged(i_layer, i_cell)
+
+    # Component listener
+    def viewChanged(self, view: Tuple[int, int]):
+        super().viewChanged(view)
+        self.__view = view
 
     # UI Event Handler methods
     def mouseButtonDown(self, i_mouse: Mouse) -> bool:

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Optional, Tuple
 
 import pygame
-from pygame.surface import Surface
+from pygame import Surface, Rect
 
 from ui.Mouse import Mouse
 from ui.MouseWheel import MouseWheel
@@ -72,6 +72,14 @@ class FrameComponent(CompositeComponent, IUIEventHandler):
         """Render the frame and its contents."""
         self._drawFrame(i_surface)
         super().render(i_surface)
+        
+    @property
+    def innerArea(self) -> Rect:
+        """Get the inner area of the frame, excluding borders."""
+        x, y = self.topLeft
+        w, h = self.size
+        s = self.theme.frameBorderSize
+        return Rect(x + s, y + s, w - 2*s, h - 2*s)
         
     # UI Event Handler methods - always return True to capture events in the frame area
     
