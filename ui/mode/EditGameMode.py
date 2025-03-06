@@ -6,10 +6,12 @@ from typing import Tuple, Union
 from core.constants import CellValue, CellValueRanges
 from core.state import World
 from core.logic import Logic
+from tools.vector import vectorMulI, vectorSubI, vectorClampI
 from ..Mouse import Mouse
 from ..theme.Theme import Theme
 from .GameMode import GameMode
 from ..component.IComponentListener import IComponentListener
+from ..component.frame.MinimapFrame import MinimapFrame
 from ..component.world.WorldComponent import WorldComponent
 from ..component.frame.PaletteFrame import PaletteFrame
 
@@ -26,13 +28,17 @@ class EditGameMode(GameMode, IComponentListener):
         # Create world component
         self.__worldComponent = WorldComponent(i_theme, i_world)
         
-        # Create palette frame
+        # Create palette and minimap frame
         self.__paletteFrame = PaletteFrame(i_theme, i_world)
         self.__paletteFrame.moveRelativeTo("bottom", self, "bottom")
+
+        self.__minimapFrame = MinimapFrame(i_theme, i_world)
+        self.__minimapFrame.moveRelativeTo("bottomRight", self, "bottomRight")
 
         # Add components in order (world first, palette on top)
         self.addComponent(self.__worldComponent)
         self.addComponent(self.__paletteFrame)
+        self.addComponent(self.__minimapFrame)
 
         # Set default brush values
         self.__mainBrushLayer = "ground"
@@ -42,6 +48,7 @@ class EditGameMode(GameMode, IComponentListener):
 
         # Register as listener
         self.__worldComponent.registerListener(self)
+        self.__minimapFrame.registerListener(self)
         self.__paletteFrame.registerListener(self)
 
     def update(self):
@@ -107,3 +114,36 @@ class EditGameMode(GameMode, IComponentListener):
         """Called when the secondary brush is selected from palette"""
         self.__secondaryBrushLayer = i_layerName
         self.__secondaryBrushValue = i_value
+
+    def processInput(self) -> bool:
+        """Process keyboard input for view movement"""
+        # Update view using keyboard state
+        keys = pygame.key.get_pressed()
+        newViewX, newViewY = self.__worldComponent.view
+        tileset = self.theme.getTileset("ground")
+        tileWidth, tileHeight = tileset.tileSize
+        if keys[pygame.K_RIGHT]:
+            newViewX += tileWidth // 4
+        if keys[pygame.K_LEFT]:
+            newViewX -= tileWidth // 4
+        if keys[pygame.K_UP]:
+            newViewY -= tileHeight // 4
+        if keys[pygame.K_DOWN]:
+            newViewY += tileHeight // 4
+        newView = (newViewX, newViewY)
+
+        # Clamp new view
+        worldSize = vectorMulI(self.__world.size, tileset.tileSize)
+        maxView = vectorSubI(worldSize, self.theme.viewSize)
+        newView = vectorClampI(newView, 0, maxView)
+
+        # Update only if changes
+        if newView != self.__worldComponent.view:
+            self.viewChanged(newView)
+            return True
+        return False
+
+    def viewChanged(self, i_view: Tuple[int, int]):
+        """Handle view change from minimap or keyboard"""
+        # Notify the world component about the view change
+        self.notifyViewChanged(i_view)
