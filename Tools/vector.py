@@ -1,33 +1,80 @@
-from typing import Tuple
+from typing import Tuple, Union
+
 
 def vectorAddI(v1: Tuple[int, int], v2: Tuple[int, int]) -> Tuple[int, int]:
-    """Add two integer vectors component-wise."""
     return v1[0] + v2[0], v1[1] + v2[1]
+
 
 def vectorSubI(v1: Tuple[int, int], v2: Tuple[int, int]) -> Tuple[int, int]:
-    """Subtract two integer vectors component-wise."""
     return v1[0] - v2[0], v1[1] - v2[1]
+
+
+def vectorCenterI(v1: Tuple[int, int], v2: Tuple[int, int]) -> Tuple[int, int]:
+    return v1[0] - v2[0] // 2, v1[1] - v2[1] // 2
+
 
 def vectorMulI(v1: Tuple[int, int], v2: Tuple[int, int]) -> Tuple[int, int]:
-    """Multiply two integer vectors component-wise."""
     return v1[0] * v2[0], v1[1] * v2[1]
+
 
 def vectorDivI(v1: Tuple[int, int], v2: Tuple[int, int]) -> Tuple[int, int]:
-    """Divide two integer vectors component-wise using integer division."""
     return v1[0] // v2[0], v1[1] // v2[1]
 
+
+def vectorMaxI(v1: Tuple[int, int], v2: Union[int, Tuple[int, int]]) -> Tuple[int, int]:
+    if type(v2) == int:
+        return max(v1[0], v2), max(v1[1], v2)
+    elif type(v2) == tuple:
+        return max(v1[0], v2[0]), max(v1[1], v2[1])
+    else:
+        raise ValueError("Invalid value type")
+
+
+def vectorMinI(v1: Tuple[int, int], v2: Union[int, Tuple[int, int]]) -> Tuple[int, int]:
+    if type(v2) == int:
+        return min(v1[0], v2), min(v1[1], v2)
+    elif type(v2) == tuple:
+        return min(v1[0], v2[0]), min(v1[1], v2[1])
+    else:
+        raise ValueError("Invalid value type")
+
+
+def vectorClampI(v1: Tuple[int, int],
+                 minv: Union[int, Tuple[int, int]],
+                 maxv: Union[int, Tuple[int, int]]) -> Tuple[int, int]:
+    if type(minv) == int:
+        if type(maxv) == int:
+            return min(max(v1[0], minv), maxv), \
+                   min(max(v1[1], minv), maxv)
+        elif type(maxv) == tuple:
+            return min(max(v1[0], minv), maxv[0]), \
+                   min(max(v1[1], minv), maxv[1])
+        else:
+            raise ValueError("Invalid value type")
+    elif type(minv) == tuple:
+        if type(maxv) == int:
+            return min(max(v1[0], minv[0]), maxv), \
+                   min(max(v1[1], minv[1]), maxv)
+        elif type(maxv) == tuple:
+            return min(max(v1[0], minv[0]), maxv[0]), \
+                   min(max(v1[1], minv[1]), maxv[1])
+        else:
+            raise ValueError("Invalid value type")
+    else:
+        raise ValueError("Invalid value type")
+
+
 def vectorAddF(v1: Tuple[float, float], v2: Tuple[float, float]) -> Tuple[float, float]:
-    """Add two float vectors component-wise."""
     return v1[0] + v2[0], v1[1] + v2[1]
 
+
 def vectorSubF(v1: Tuple[float, float], v2: Tuple[float, float]) -> Tuple[float, float]:
-    """Subtract two float vectors component-wise."""
     return v1[0] - v2[0], v1[1] - v2[1]
 
+
 def vectorMulF(v1: Tuple[float, float], v2: Tuple[float, float]) -> Tuple[float, float]:
-    """Multiply two float vectors component-wise."""
     return v1[0] * v2[0], v1[1] * v2[1]
 
+
 def vectorDivF(v1: Tuple[float, float], v2: Tuple[float, float]) -> Tuple[float, float]:
-    """Divide two float vectors component-wise."""
     return v1[0] / v2[0], v1[1] / v2[1]
