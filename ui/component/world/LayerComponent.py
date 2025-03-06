@@ -5,7 +5,7 @@ LayerComponent.py renders a specific game world layer using its corresponding ti
 import random
 from pygame import SRCALPHA
 from pygame.surface import Surface
-from typing import Tuple, List, Optional
+from typing import Tuple, List, Optional, Generator
 
 from core.constants import CellValue
 from core.state import World, Layer, ILayerListener
@@ -25,6 +25,7 @@ class LayerComponent(Component, ILayerListener):
         self.__tileset = i_theme.getTileset(i_name)
         self.__needRefresh = True
         self.__autoTiling = True
+        self.__view = (0, 0)  # New: top-left corner of the current view
         
         # Register as a listener to get notifications about cell changes
         self.__layer.registerListener(self)
@@ -69,10 +70,40 @@ class LayerComponent(Component, ILayerListener):
         """Set auto-tiling mode and mark for refresh."""
         self.__autoTiling = i_value
         self.__needRefresh = True
+        
+    @property
+    def view(self) -> Tuple[int, int]:
+        """Get the current view position."""
+        return self.__view
+        
 
     def needRefresh(self) -> bool:
         """Check if the layer needs to be redrawn."""
         return self.__needRefresh
+        
+    def renderedCells(self, i_surface: Surface) -> Generator[Tuple[Tuple[int, int], int, Tuple[int, int]], None, None]:
+        """Generate the cells visible in the current view."""
+        tileWidth, tileHeight = self.tileset.tileSize
+        layerWidth, layerHeight = self.__layer.size
+        surfaceWidth, surfaceHeight = i_surface.get_size()
+        viewX, viewY = self.view
+        
+        # Iterate through all visible cells
+        for y in range(0, surfaceHeight + 1, tileHeight):
+            cellY = (y + viewY) // tileHeight
+            if cellY < 0 or cellY >= layerHeight:
+                continue
+            for x in range(0, surfaceWidth + 1, tileWidth):
+                cellX = (x + viewX) // tileWidth
+                if cellX < 0 or cellX >= layerWidth:
+                    continue
+                    
+                # Calculate destination position on screen
+                dest = (x - viewX % tileWidth, y - viewY % tileHeight)
+                cell = (cellX, cellY)
+                value = self.__layer.get_cell_value(cell)
+                
+                yield dest, value, cell
 
     def render(self, i_surface: Surface):
         """Base render method, to be overridden by subclasses."""
@@ -84,3 +115,8 @@ class LayerComponent(Component, ILayerListener):
         """Called when a cell in a layer changes."""
         if layer == self.__layer:
             self.__needRefresh = True  # Mark for refresh when a cell changes
+
+    def viewChanged(self, view: Tuple[int, int]):
+        if view != self.__view:
+            self.__needRefresh = True
+            self.__view = view
