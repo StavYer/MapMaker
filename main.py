@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.INFO, format='\r%(asctime)s %(filename)s:%(lin
 # Create a basic game state
 from ui.mode import EditGameMode
 
-world = World(20, 15)
+world = World(80, 60)
 ground = world.ground
 for y in range(0, world.height):
     for x in range(0, world.width):
@@ -16,7 +16,8 @@ for y in range(0, world.height):
 
 # Create a user interface object and run it
 theme = Theme()
-theme.viewSize = (world.width * 16, world.height * 16)
+tileSize = theme.getTileset("ground").tileSize
+theme.viewSize = (20 * tileSize[0], 15 * tileSize[1])
 user_interface = UserInterface(theme)
 gameMode = EditGameMode(theme, world)
 user_interface.setGameMode(gameMode)
