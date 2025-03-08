@@ -143,7 +143,4 @@ class EditGameMode(GameMode, IComponentListener):
             return True
         return False
 
-    def viewChanged(self, i_view: Tuple[int, int]):
-        """Handle view change from minimap or keyboard"""
-        # Notify the world component about the view change
-        self.notifyViewChanged(i_view)
+  
