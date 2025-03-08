@@ -14,36 +14,44 @@ class GroundComponent(LayerComponent):
         self.__code2rect = self.tileset.getCode8Rects(0, 0)
 
     def render(self, i_surface: Surface):
-        # Render the ground layer on the given surface
         super().render(i_surface)
         tileset = self.tileset.surface
         tilesRects = self.tileset.getTilesRects()
-        tileWidth, tileHeight = self.tileset.tileSize
-        
-        # Loop through each cell in the layer
-        for y in range(self.layer.height):
-            for x in range(self.layer.width):
-                value = self.layer[x, y]
-                if value == CellValue.NONE:
-                    continue  # Skip empty cells
-                
-                tile = (x * tileWidth, y * tileHeight)
-                
-                if self.autoTiling:
-                    # Auto-tiling logic
-                    rects = tilesRects[value]
-                    tileCount = len(rects)
-                    rectIndex = self.noise[y][x] % tileCount
-                    i_surface.blit(tileset, tile, rects[rectIndex])
 
-                    # Add border tiles for sea
-                    if value == CellValue.GROUND_SEA:
-                        neighbors = self.layer.getNeighbors8((x, y))
-                        mask = mask8(neighbors, CellValue.GROUND_SEA)
-                        code = code8(mask)
-                        rect = self.__code2rect[code]
-                        i_surface.blit(tileset, tile, rect)
-                else:
-                    # Default tiling logic
-                    rects = tilesRects[value]
-                    i_surface.blit(tileset, tile, rects[0])
+        # Get dimensions for rendering calculations
+        tileWidth, tileHeight = self.tileset.tileSize
+        layerWidth, layerHeight = self.layer.size
+        surfaceWidth, surfaceHeight = i_surface.get_size()
+        viewX, viewY = self.view
+        
+        # Iterate through visible tile positions
+        for y in range(0, surfaceHeight + 1, tileHeight):
+            cellY = (y + viewY) // tileHeight
+            # Skip if cell is outside layer bounds
+            if cellY < 0 or cellY >= layerHeight:
+                continue
+            for x in range(0, surfaceWidth + 1, tileWidth):
+                cellX = (x + viewX) // tileWidth
+                # Skip if cell is outside layer bounds
+                if cellX < 0 or cellX >= layerWidth:
+                    continue
+                dest = (x - viewX % tileWidth, y - viewY % tileHeight)
+
+                # Get cell value and skip empty cells
+                value = self.layer.get_cell_value((cellX, cellY))
+                if value == CellValue.NONE:
+                    continue
+                
+                # Select tile variation using noise for visual diversity
+                rects = tilesRects[value]
+                tileCount = len(rects)
+                rectIndex = self.noise[cellY][cellX] % tileCount
+                i_surface.blit(tileset, dest, rects[rectIndex])
+                
+                # Handle sea tile edge transitions
+                if value == CellValue.GROUND_SEA:
+                    neighbors = self.layer.getNeighbors8((cellX, cellY))
+                    mask = mask8(neighbors, CellValue.GROUND_SEA)
+                    code = code8(mask)
+                    rect = self.__code2rect[code]
+                    i_surface.blit(tileset, dest, rect)

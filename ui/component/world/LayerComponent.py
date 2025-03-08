@@ -9,12 +9,13 @@ from typing import Tuple, List, Optional, Generator
 
 from core.constants import CellValue
 from core.state import World, Layer, ILayerListener
+from ..IComponentListener import IComponentListener
 from ..Component import Component
 from ui.theme.Theme import Theme
 from ui.theme.Tileset import Tileset
 
 
-class LayerComponent(Component, ILayerListener):
+class LayerComponent(Component, ILayerListener, IComponentListener):
     """Component that renders a layer and listens for cell changes."""
     
     def __init__(self, i_theme: Theme, i_world: World, i_name: str):
@@ -27,9 +28,6 @@ class LayerComponent(Component, ILayerListener):
         self.__autoTiling = True
         self.__view = (0, 0)  # New: top-left corner of the current view
         
-        # Register as a listener to get notifications about cell changes
-        self.__layer.registerListener(self)
-        
         # Generate noise for random tile selection
         random.seed(i_name)  # Use consistent seed based on layer name
         self.__noise = []
@@ -39,6 +37,9 @@ class LayerComponent(Component, ILayerListener):
             for x in range(width):
                 row.append(random.randint(0, 100000))
             self.__noise.append(row)
+        
+        # Register as a listener to get notifications about cell changes
+        self.__layer.registerListener(self)
 
     def dispose(self):
         """Remove this component from the layer's listeners when disposed."""
