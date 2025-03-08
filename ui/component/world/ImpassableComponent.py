@@ -25,46 +25,30 @@ class ImpassableComponent(LayerComponent):
             Direction.BOTTOM: self.tileset.getTileRect("riverMouthBottom"),
         }
 
-    def render(self, i_surface: Surface):
-        """Render the impassable terrain features on the given surface"""
-        super().render(i_surface)
-        i_tileset = self.tileset.surface
-        i_tilesRects = self.tileset.getTilesRects()
-        i_tileWidth, i_tileHeight = self.tileset.tileSize
-        
-        # Iterate over each cell in the layer
-        for i_y in range(self.layer.height):
-            for i_x in range(self.layer.width):
-                i_value = self.layer[i_x, i_y]
-                i_tile = (i_x * i_tileWidth, i_y * i_tileHeight)
-                
-                if self.autoTiling:
-                    if i_value == CellValue.NONE:
-                        # Check for sea connections in the ground layer
-                        i_groundValue = self.__ground.get_cell_value((i_x, i_y))
-                        if i_groundValue == CellValue.GROUND_SEA:
-                            for i_direction in directions:
-                                if self.layer.get_cell_value((i_x, i_y), i_direction) == CellValue.IMPASSABLE_RIVER:
-                                    i_rect = self.__riverMouth[i_direction]
-                                    i_surface.blit(i_tileset, i_tile, i_rect)
-                    elif i_value == CellValue.IMPASSABLE_RIVER:
-                        # Determine the appropriate river tile based on neighbors
-                        i_neighbors = self.layer.getNeighbors4((i_x, i_y))
-                        i_mask = mask4(i_neighbors, CellValue.IMPASSABLE_RIVER)
-                        i_mask = combine4(i_mask, mask4(i_neighbors, CellValue.IMPASSABLE_MOUNTAIN))
-                        i_neighbors = self.__ground.getNeighbors4((i_x, i_y))
-                        i_mask = combine4(i_mask, mask4(i_neighbors, CellValue.GROUND_SEA))
-                        i_code = code4(i_mask)
-                        i_rect = self.__river_code2rect[i_code]
-                        i_surface.blit(i_tileset, i_tile, i_rect)
-                    else:
-                        # Render other impassable features
-                        i_rects = i_tilesRects[i_value]
-                        i_tileCount = len(i_rects)
-                        i_rectIndex = self.noise[i_y][i_x] % i_tileCount
-                        i_rect = i_rects[i_rectIndex]
-                        i_surface.blit(i_tileset, i_tile, i_rect)
-                elif i_value != CellValue.NONE:
-                    # Render non-auto-tiling impassable features
-                    i_rects = i_tilesRects[i_value]
-                    i_surface.blit(i_tileset, i_tile, i_rects[0])
+    def render(self, surface: Surface):
+        super().render(surface)
+        tileset = self.tileset.surface
+        tilesRects = self.tileset.getTilesRects()
+        for dest, value, cell in self.renderedCells(surface):
+            if value == CellValue.NONE:
+                groundValue = self.__ground.get_cell_value(cell)
+                if groundValue == CellValue.GROUND_SEA:
+                    for direction in directions:
+                        if self.layer.get_cell_value(cell, direction) == CellValue.IMPASSABLE_RIVER:
+                            rect = self.__riverMouth[direction]
+                            surface.blit(tileset, dest, rect)
+            elif value == CellValue.IMPASSABLE_RIVER:
+                neighbors = self.layer.getNeighbors4(cell)
+                mask = mask4(neighbors, CellValue.IMPASSABLE_RIVER)
+                mask = combine4(mask, mask4(neighbors, CellValue.IMPASSABLE_MOUNTAIN))
+                neighbors = self.__ground.getNeighbors4(cell)
+                mask = combine4(mask, mask4(neighbors, CellValue.GROUND_SEA))
+                code = code4(mask)
+                rect = self.__river_code2rect[code]
+                surface.blit(tileset, dest, rect)
+            else:
+                rects = tilesRects[value]
+                tileCount = len(rects)
+                rectIndex = self.noise[cell[1]][cell[0]] % tileCount
+                rect = rects[rectIndex]
+                surface.blit(tileset, dest, rect)
