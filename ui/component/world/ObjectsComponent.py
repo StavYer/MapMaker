@@ -1,6 +1,6 @@
 from pygame import Surface
 
-from core.constants import CellValue
+from core.constants import CellValue, Direction
 from core.state import World
 from tools.tilecodes import mask4, combine4, code4
 from .LayerComponent import LayerComponent
