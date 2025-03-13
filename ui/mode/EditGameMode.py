@@ -10,6 +10,7 @@ from tools.vector import vectorMulI, vectorSubI, vectorClampI
 from ..Mouse import Mouse
 from ..theme.Theme import Theme
 from .GameMode import GameMode
+from ..component.frame.ResourcesFrame import ResourcesFrame
 from ..component.IComponentListener import IComponentListener
 from ..component.frame.MinimapFrame import MinimapFrame
 from ..component.world.WorldComponent import WorldComponent
@@ -27,6 +28,10 @@ class EditGameMode(GameMode, IComponentListener):
 
         # Create world component
         self.__worldComponent = WorldComponent(i_theme, i_world)
+
+        # Create resources frame
+        self.__resourcesFrame = ResourcesFrame(theme)
+        self.__resourcesFrame.moveRelativeTo("topLeft", self, "topLeft")
         
         # Create palette and minimap frame
         self.__paletteFrame = PaletteFrame(i_theme, i_world)
@@ -37,6 +42,7 @@ class EditGameMode(GameMode, IComponentListener):
 
         # Add components in order (world first, palette on top)
         self.addComponent(self.__worldComponent)
+        self.addComponent(self.__resourcesFrame)
         self.addComponent(self.__paletteFrame)
         self.addComponent(self.__minimapFrame)
 
