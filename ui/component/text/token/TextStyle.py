@@ -119,7 +119,7 @@ class TextStyle:
             surface0 = surface
             width = surface0.get_width()
             height = crop[1] - crop[0]
-            surface = Surface((width, height))
+            surface = Surface((width, height), flags=pygame.SRCALPHA)
             area = Rect(0, crop[0], width, height)
             surface.blit(surface0, (0, 0), area)
         
