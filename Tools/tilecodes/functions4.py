@@ -1,5 +1,6 @@
 from typing import Tuple
 
+import numpy as np
 
 def mask4(i_a: Tuple[int, int, int, int],
           i_value: int) -> Tuple[int, int, int, int]:
@@ -24,3 +25,9 @@ def combine4(
 def code4(i_a: Tuple[int, int, int, int]) -> int:
     """Convert binary mask to numeric code using powers of 2"""
     return i_a[0] + 2 * i_a[1] + 4 * i_a[2] + 8 * i_a[3]
+
+weights4 = np.array((1, 2, 4, 8))
+
+
+def code4np(a: np.ndarray) -> np.ndarray:
+    return a.dot(weights4)

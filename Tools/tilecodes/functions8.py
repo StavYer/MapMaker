@@ -1,5 +1,6 @@
 from typing import Tuple
 
+import numpy as np
 
 def mask8(
         i_a: Tuple[int, int, int, int, int, int, int, int],
@@ -67,3 +68,9 @@ def decode8(i_code: int) -> Tuple[int, int, int, int, int, int, int, int]:
         (i_code & 64) // 64,
         (i_code & 128) // 128
     )
+
+weights8 = np.array((1, 2, 4, 8, 16, 32, 64, 128))
+
+
+def code8np(a: np.ndarray) -> np.ndarray:
+    return a.dot(weights8)
