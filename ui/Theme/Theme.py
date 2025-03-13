@@ -7,6 +7,7 @@ import os
 from typing import Dict, Tuple, Union, Optional
 
 import pygame
+from pygame.color import Color
 from pygame.font import Font
 from pygame.surface import Surface
 
@@ -29,18 +30,27 @@ class Theme:
         # Set the frame border size based on the tile size of the "frame" tileset.
         self.__frameBorderSize = self.__tilesets["frame"].tileSize[0]
 
-        # Define default font settings.
         self.__fontsDef = {
             "default": {
                 "file": "font/prstart/prstartk.ttf",
-                "size": 8
-            }
+                "size": 8,
+                "crop": None
+            },
+            "small": {
+                "file": "font/lilliputsteps/lilliputsteps.ttf",
+                "size": 8,
+                "crop": (3, 8)
+            },
+            "large": {
+                "file": "font/prstart/prstartk.ttf",
+                "size": 32,
+                "crop": None
+            },
         }
-        # Define default font colors.
         self.__fontColors = {
-            "default": (100, 75, 50)
+            "default": Color(100, 75, 50),
+            "warning": Color(200, 50, 35),
         }
-        # Initialize a cache for loaded font objects.
         self.__fonts = {}
 
     @property
@@ -105,6 +115,14 @@ class Theme:
             raise ValueError("No font color {}".format(i_name))
             
         return self.__fontColors[i_name]
+    
+    def getFontCrop(self, i_name: Optional[str] = None) -> Union[None, Tuple[int, int]]:
+        if i_name is None:
+            i_name = "default"
+        if i_name not in self.__fontsDef:
+            raise ValueError("No font {}".format(i_name))
+        fontDef = self.__fontsDef[i_name]
+        return fontDef["crop"]
 
 
 # Tile definitions for various layers (e.g., ground, impassable, objects).
@@ -154,17 +172,36 @@ tilesDefs = {
         "imageFile": "toen/frame.png",
         "tileSize": (4, 4),
         "tiles": {
-            "none": (0, 0),
-            "topLeft": (0, 1),
-            "top": (1, 1),
-            "topRight": (2, 1),
-            "left": (0, 2),
-            "center": (1, 2),
-            "right": (2, 2),
-            "bottomLeft": (0, 3),
-            "bottom": (1, 3),
-            "bottomRight": (2, 3),
-        },
+        "none": (0, 0),
+        "arrowUp": (3, 1, 2, 2),
+        "arrowDown": (5, 1, 2, 2),
+        "arrowUpDisabled": (3, 3, 2, 2),
+        "arrowDownDisabled": (5, 3, 2, 2),
+        "topLeft": (0, 1),
+        "top": (1, 1),
+        "topRight": (2, 1),
+        "left": (0, 2),
+        "center": (1, 2),
+        "right": (2, 2),
+        "bottomLeft": (0, 3),
+        "bottom": (1, 3),
+        "bottomRight": (2, 3),
+        "food": (7, 7, 2, 2),
+        "gold": (9, 7, 2, 2),
+        "wood": (11, 7, 2, 2),
+        "stone": (13, 7, 2, 2),
+        "dungeon": (17, 0, 8, 8),
     },
+    },
+    "icons": {
+        "imageFile": "toen/icons.png",
+        "tileSize": (5, 5),
+        "tiles": {
+        "food": (0, 0),
+        "gold": (1, 0),
+        "wood": (2, 0),
+        "stone": (3, 0),
+    },
+    }
 }
 

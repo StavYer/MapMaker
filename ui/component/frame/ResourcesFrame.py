@@ -1,7 +1,7 @@
 from pygame.surface import Surface
 
 from .FrameComponent import FrameComponent
-from ..text import TextRenderer
+from ..text.TextRenderer import TextRenderer
 from ...theme.Theme import Theme
 
 

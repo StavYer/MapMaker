@@ -30,7 +30,7 @@ class EditGameMode(GameMode, IComponentListener):
         self.__worldComponent = WorldComponent(i_theme, i_world)
 
         # Create resources frame
-        self.__resourcesFrame = ResourcesFrame(theme)
+        self.__resourcesFrame = ResourcesFrame(i_theme)
         self.__resourcesFrame.moveRelativeTo("topLeft", self, "topLeft")
         
         # Create palette and minimap frame
