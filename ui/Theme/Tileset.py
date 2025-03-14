@@ -1,10 +1,12 @@
 from __future__ import annotations  # Enable forward references
 from typing import Dict, Tuple, TYPE_CHECKING, Union, Optional, List
+import numpy as np
 import pygame
 from pygame.rect import Rect
 from pygame.surface import Surface
 from pygame import Color
 
+from core.constants.CellValue import CellValue
 from tools.tilecodes import tilecodes4, decode8, simplify8, code8
 from tools.tilecodes import tilecodes8
 
@@ -118,17 +120,20 @@ class Tileset:
             ))
         return code2rect
 
-    def getTilesColor(self, i_valueRange: Tuple[int, int]) -> Dict[int, Color]:
+    def getTilesColor(self, i_valueRange: Tuple[int, int]) -> np.ndarray:
         """Get the average colors of tiles within the given value range."""
-        colors = {}
+        colors = np.zeros([CellValue.MAX_VALUE, 4], dtype=np.int32)
         for value in range(i_valueRange[0], i_valueRange[1]):
-            if value in self.__tilesRects:
-                rects = self.__tilesRects[value]
-                color = pygame.transform.average_color(self.surface, rects[0])
-                colors[value] = color
-            
-            else:
-                raise ValueError(f"No tile for value {value}")
-                
+            if value not in self.__tilesRects:
+                raise ValueError("No tile definition for value {}".format(value))
+            rects = self.__tilesRects[value]
+            tile = self.surface.subsurface(rects[0])
+            array = pygame.surfarray.array3d(tile)
+            alpha = pygame.surfarray.array_alpha(tile)
+            count = np.count_nonzero(alpha)
+            if count > 0:
+                color = array.reshape(-1, 3).sum(axis=0) / count
+                colors[value, 0:3] = color
+                colors[value, 3] = 255
         return colors
 

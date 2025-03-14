@@ -6,6 +6,7 @@ like the size of tiles or the used tilesets.
 import os
 from typing import Dict, Tuple, Union, Optional
 
+import numpy as np
 import pygame
 from pygame.color import Color
 from pygame.font import Font
@@ -67,6 +68,10 @@ class Theme:
     def viewSize(self, size: Tuple[int, int]):
         # Set the view size to the given value.
         self.__viewSize = size
+    
+    def createRandomGenerator(self, seedStr: str) -> np.random.Generator:
+        seed = sum(map(ord, seedStr))
+        return np.random.default_rng(seed)
 
     def getSurface(self, i_imageFile: str) -> Surface:
         # Return a cached Surface; load it if not already loaded.
