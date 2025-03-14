@@ -1,5 +1,6 @@
-from typing import Optional, Tuple
+from typing import Optional, Tuple, cast
 
+import numpy as np
 import pygame
 from pygame import Rect, Surface
 
@@ -37,23 +38,40 @@ class MinimapFrame(FrameComponent, ILayerListener):
         for layer in self.__world.layers:
             layer.removeListener(self)
 
-    def __renderMinimap(self):
-        # Render the minimap by iterating over each cell in the world
-        layers = list(zip(
+    def __renderMinimap(self, cellsBox: Optional[Tuple[int, int, int, int]] = None):
+        layers = zip(
             reversed(self.__world.layerNames),
             reversed(self.__world.layers)
-        ))
-        worldWidth, worldHeight = self.__world.size
-        minimapSurface = Surface((worldWidth, worldHeight))
-        for y in range(worldHeight):
-            for x in range(worldWidth):
-                for name, layer in layers:
-                    value = layer.get_cell_value((x, y))
-                    if value != CellValue.NONE:
-                        color = self.__colors[name][value]
-                        minimapSurface.set_at((x, y), color)
-                        break
-        self.__minimapSurface = minimapSurface
+        )
+        minimapArray: Optional[np.ndarray] = None
+        if self.__minimapSurface is None or cellsBox is None:
+            for name, layer in layers:
+                colorMap = self.__colors[name]
+                colors = colorMap[layer.cells]
+                if minimapArray is None:
+                    minimapArray = colors
+                else:
+                    transparent = minimapArray[..., 3] == 0
+                    minimapArray[transparent] = colors[transparent]
+
+            if minimapArray is not None:
+                surface = pygame.surfarray.make_surface(minimapArray[..., 0:3])
+                self.__minimapSurface = cast(Surface, surface.convert_alpha())
+        else:
+            cellMinX, cellMaxX, cellMinY, cellMaxY = cellsBox
+            cellsSlice = np.s_[cellMinX:cellMaxX, cellMinY:cellMaxY]
+            for name, layer in layers:
+                colorMap = self.__colors[name]
+                cells = layer.cells[cellsSlice]
+                colors = colorMap[cells]
+                if minimapArray is None:
+                    minimapArray = colors
+                else:
+                    transparent = minimapArray[..., 3] == 0
+                    minimapArray[transparent] = colors[transparent]
+            if minimapArray is not None:
+                minimapArea = pygame.surfarray.make_surface(minimapArray[..., 0:3]).convert_alpha()
+                self.__minimapSurface.blit(minimapArea, (cellMinX, cellMinY))
 
     def render(self, i_surface: Surface):
         super().render(i_surface)
@@ -134,10 +152,12 @@ class MinimapFrame(FrameComponent, ILayerListener):
 
     def viewChanged(self, i_view: Tuple[int, int]):
         if i_view != self.__view:
-            self.__minimapSurface = None
             self.__view = i_view
 
     # Layer listener
 
     def cellChanged(self, i_layer: Layer, i_cell: Tuple[int, int]):
-        self.__minimapSurface = None
+        cellX, cellY = i_cell
+        cellMinX, cellMaxX = max(cellX, 0), min(cellX + 1, i_layer.width)
+        cellMinY, cellMaxY = max(cellY, 0), min(cellY + 1, i_layer.height)
+        self.__renderMinimap((cellMinX, cellMaxX, cellMinY, cellMaxY))
