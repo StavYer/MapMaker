@@ -21,6 +21,8 @@ class CellValue(IntEnum):
     OBJECTS_CAMP = 309
     OBJECTS_FARM = 310
 
+    MAX_VALUE = 1000
+
 CellValueRanges = {
     "ground": (101, 103),
     "impassable": (201, 204),
