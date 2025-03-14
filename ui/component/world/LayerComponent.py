@@ -9,6 +9,7 @@ from typing import Tuple, List, Optional, Generator
 
 from core.constants import CellValue
 from core.state import World, Layer, ILayerListener
+from .LayerRenderer import LayerRenderer
 from ..IComponentListener import IComponentListener
 from ..Component import Component
 from ui.theme.Theme import Theme
@@ -29,14 +30,9 @@ class LayerComponent(Component, ILayerListener, IComponentListener):
         self.__view = (0, 0)  # New: top-left corner of the current view
         
         # Generate noise for random tile selection
-        random.seed(i_name)  # Use consistent seed based on layer name
-        self.__noise = []
-        width, height = self.__layer.width, self.__layer.height
-        for y in range(height):
-            row = []
-            for x in range(width):
-                row.append(random.randint(0, 100000))
-            self.__noise.append(row)
+        generator = i_theme.createRandomGenerator(i_name)
+        self.__noise = generator.integers(0, 100000, size=self.__layer.size)
+        self.__noise.flags.writeable = False
         
         # Register as a listener to get notifications about cell changes
         self.__layer.registerListener(self)
@@ -76,6 +72,32 @@ class LayerComponent(Component, ILayerListener, IComponentListener):
     def view(self) -> Tuple[int, int]:
         """Get the current view position."""
         return self.__view
+    
+    def createRenderer(self, surface: Surface) -> LayerRenderer:
+        tileWidth, tileHeight = self.__tileset.tileSize
+        layerWidth, layerHeight = self.__layer.size
+        surfaceWidth, surfaceHeight = surface.get_size()
+        viewX, viewY = self.__view
+
+        cellMinX, cellMaxX = 100000, -100000
+        for x in range(0, surfaceWidth + 1, tileWidth):
+            cellX = (x + viewX) // tileWidth
+            if cellX < 0 or cellX >= layerWidth:
+                continue
+            cellMinX = min(cellMinX, cellX)
+            cellMaxX = max(cellMaxX, cellX)
+
+        cellMinY, cellMaxY = 100000, -100000
+        for y in range(0, surfaceHeight + 1, tileHeight):
+            cellY = (y + viewY) // tileHeight
+            if cellY < 0 or cellY >= layerHeight:
+                continue
+            cellMinY = min(cellMinY, cellY)
+            cellMaxY = max(cellMaxY, cellY)
+        return LayerRenderer(self.__layer.cells,
+            cellMinX, cellMinY, cellMaxX + 1, cellMaxY + 1,
+            self.__view, self.__tileset.tileSize
+        )
         
 
     def needRefresh(self) -> bool:

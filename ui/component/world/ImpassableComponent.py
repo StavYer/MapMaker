@@ -1,8 +1,9 @@
+import numpy as np
 from pygame import Surface
 
 from core.constants import CellValue, Direction, directions
 from core.state import World
-from tools.tilecodes import mask4, combine4, code4
+from tools.tilecodes import code4np
 from .LayerComponent import LayerComponent
 from ...theme.Theme import Theme
 
@@ -29,26 +30,45 @@ class ImpassableComponent(LayerComponent):
         super().render(surface)
         tileset = self.tileset.surface
         tilesRects = self.tileset.getTilesRects()
-        for dest, value, cell in self.renderedCells(surface):
-            if value == CellValue.NONE:
-                groundValue = self.__ground.get_cell_value(cell)
-                if groundValue == CellValue.GROUND_SEA:
-                    for direction in directions:
-                        if self.layer.get_cell_value(cell, direction) == CellValue.IMPASSABLE_RIVER:
-                            rect = self.__riverMouth[direction]
-                            surface.blit(tileset, dest, rect)
-            elif value == CellValue.IMPASSABLE_RIVER:
-                neighbors = self.layer.getNeighbors4(cell)
-                mask = mask4(neighbors, CellValue.IMPASSABLE_RIVER)
-                mask = combine4(mask, mask4(neighbors, CellValue.IMPASSABLE_MOUNTAIN))
-                neighbors = self.__ground.getNeighbors4(cell)
-                mask = combine4(mask, mask4(neighbors, CellValue.GROUND_SEA))
-                code = code4(mask)
-                rect = self.__river_code2rect[code]
-                surface.blit(tileset, dest, rect)
-            else:
-                rects = tilesRects[value]
-                tileCount = len(rects)
-                rectIndex = self.noise[cell[1]][cell[0]] % tileCount
-                rect = rects[rectIndex]
-                surface.blit(tileset, dest, rect)
+
+        renderer = self.createRenderer(surface)
+        cellsSlice = renderer.cellsSlice
+        cellsBox = renderer.cellsBox
+        cells = self.layer.cells[cellsSlice]
+
+        # Default
+        valid = cells != CellValue.NONE
+        valid &= cells != CellValue.IMPASSABLE_RIVER
+        noise = self.noise[cellsSlice]
+        for dest, value, cell in renderer.coords(valid):
+            rects = tilesRects[value]
+            rectIndex = int(noise[cell]) % len(rects)
+            surface.blit(tileset, dest, rects[rectIndex])
+
+        # Rivers
+        neighbors = self.layer.getAreaNeighbors4(cellsBox)
+        masks = neighbors == CellValue.IMPASSABLE_RIVER
+        masks |= neighbors == CellValue.IMPASSABLE_MOUNTAIN
+        groundNeighbors = self.__ground.getAreaNeighbors4(cellsBox)
+        masks |= groundNeighbors == CellValue.GROUND_SEA
+        codes = code4np(masks)
+
+        valid = cells == CellValue.IMPASSABLE_RIVER
+        for dest, value, cell in renderer.coords(valid):
+            rect = self.__river_code2rect[codes[cell]]
+            surface.blit(tileset, dest, rect)
+
+        # River mouths
+        groundCells = self.__ground.cells[cellsSlice]
+        valid = cells == CellValue.NONE
+        valid &= groundCells == CellValue.GROUND_SEA
+        codes = code4np(neighbors == CellValue.IMPASSABLE_RIVER)
+        valid &= codes != 0
+        cellMinX, _, cellMinY, _ = renderer.cellsBox
+        for dest, _, cell in renderer.coords(valid):
+            for direction in directions:
+                cellX, cellY = cellMinX + cell[0], cellMinY + cell[1]
+                value = self.layer.get_cell_value((cellX, cellY), direction)
+                if value == CellValue.IMPASSABLE_RIVER:
+                    rect = self.__riverMouth[direction]
+                    surface.blit(tileset, dest, rect)
