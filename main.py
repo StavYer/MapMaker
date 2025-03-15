@@ -1,5 +1,5 @@
 import logging
-from core.state import World
+from core.state import World, GameState
 from core.constants import CellValue
 from ui import UserInterface, Theme
 
@@ -15,11 +15,12 @@ for y in range(0, world.height):
         ground.set_cell_value(x, y, CellValue.GROUND_SEA)
 
 # Create a user interface object and run it
+state = GameState(world)
 theme = Theme()
 tileSize = theme.getTileset("ground").tileSize
 theme.viewSize = (20 * tileSize[0], 15 * tileSize[1])
 user_interface = UserInterface(theme)
-gameMode = EditGameMode(theme, world)
+gameMode = EditGameMode(theme, state)
 user_interface.setGameMode(gameMode)
 
 user_interface.run()
