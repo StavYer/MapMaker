@@ -1,10 +1,11 @@
 # core/state/Layer.py
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Dict
 
 import numpy as np
 
 from ..Listenable import Listenable
 from .ILayerListener import ILayerListener
+from .Unit import Unit
 from ..constants.CellValue import CellValue
 from core.constants.Direction import Direction
 
@@ -21,6 +22,8 @@ class Layer(Listenable[ILayerListener]):
         self.__size = (input_width, input_height)
         # Create array with 1-cell border all around for easier neighbor access
         self.__cells = np.full([input_width+2, input_height+2], input_defaultValue, dtype=np.int32)
+        # Dictionary to store units by coordinates
+        self.__units: Dict[Tuple[int, int], Unit] = {}
     
     # Getter properties
     @property
@@ -132,3 +135,23 @@ class Layer(Listenable[ILayerListener]):
         bottomRight = self.__cells[2:w + 2, 2:h + 2]
         return np.stack((topLeft, left, bottomLeft, top,
                          bottom, topRight, right, bottomRight), axis=2)
+    
+    # Units
+    def getUnit(self, coords: Tuple[int, int]) -> Optional[Unit]:
+        """Get unit at the specified coordinates"""
+        if coords not in self.__units:
+            return None
+        return self.__units[coords]
+
+    def setUnit(self, coords: Tuple[int, int], value: CellValue, unit: Optional[Unit] = None):
+        """Set or remove a unit at the specified coordinates"""
+        x, y = coords[0], coords[1]
+        assert 0 <= x < self.__width, f"Invalid x={x}"
+        assert 0 <= y < self.__height, f"Invalid y={y}"
+        if value == CellValue.NONE or unit is None:
+            self.__cells[x + 1, y + 1] = CellValue.NONE
+            if coords in self.__units:
+                del self.__units[coords]
+        else:
+            self.__cells[x + 1, y + 1] = value
+            self.__units[coords] = unit

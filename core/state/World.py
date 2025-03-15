@@ -13,7 +13,8 @@ class World:
         self.__layers = {
             "ground": Layer(input_width, input_height, CellValue.GROUND_SEA),
             "impassable": Layer(input_width, input_height, CellValue.NONE),
-            "objects": Layer(input_width, input_height, CellValue.NONE)
+            "objects": Layer(input_width, input_height, CellValue.NONE),
+            "units": Layer(input_width, input_height, CellValue.NONE),
         }
 
     # Getter properties
@@ -41,6 +42,10 @@ class World:
     @property
     def objects(self) -> Layer:
         return self.__layers["objects"]
+    
+    @property
+    def units(self) -> Layer:
+        return self.__layers["units"]
 
     # Getter for a single layer
     def getLayer(self, name: str) -> Layer:
