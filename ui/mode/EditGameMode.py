@@ -36,7 +36,7 @@ class EditGameMode(GameMode, IComponentListener):
         
         # Create palette and minimap frame
         self.__paletteFrame = PaletteFrame(i_theme, self.__state)
-        self.__paletteFrame.moveRelativeTo("bottom", self, "bottom")
+        self.__paletteFrame.moveRelativeTo("bottomLeft", self, "bottomLeft")
 
         self.__minimapFrame = MinimapFrame(i_theme, self.__world)
         self.__minimapFrame.moveRelativeTo("bottomRight", self, "bottomRight")
