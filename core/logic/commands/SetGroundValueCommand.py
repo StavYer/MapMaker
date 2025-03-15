@@ -58,7 +58,7 @@ class SetGroundValueCommand(SetLayerValueCommand):
         # If fill is enabled, recursively add commands for adjacent cells
         if hasattr(self, '_fill') and self._fill:
             x, y = coords[0], coords[1]
-            i_logic.addCommand(SetGroundValueCommand((x + 1, y), self._unit, value, True))
-            i_logic.addCommand(SetGroundValueCommand((x - 1, y), self._unit, value, True))
-            i_logic.addCommand(SetGroundValueCommand((x, y + 1), self._unit, value, True))
-            i_logic.addCommand(SetGroundValueCommand((x, y - 1), self._unit, value, True))
+            i_logic.addCommand(SetGroundValueCommand((x + 1, y), value, self._unit, True))
+            i_logic.addCommand(SetGroundValueCommand((x - 1, y), value, self._unit, True))
+            i_logic.addCommand(SetGroundValueCommand((x, y + 1), value, self._unit, True))
+            i_logic.addCommand(SetGroundValueCommand((x, y - 1), value, self._unit, True))

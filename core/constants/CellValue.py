@@ -28,7 +28,8 @@ class CellValue(IntEnum):
 CellValueRanges = {
     "ground": (101, 103),
     "impassable": (201, 204),
-    "objects": (301, 311)
+    "objects": (301, 311),
+    "units": (401, 402)
 }
 
 def getCellValues(i_layer: str) -> List[int]:
@@ -48,9 +49,5 @@ def checkCellValue(layer: str, value: CellValue):
     
     # check if whithin the range
     valueRange = CellValueRanges[layer]
-    try:
-        return valueRange[0] <= value < valueRange[1]
-    except Exception as e:
-        print(f"this is value: {value}")
-        print(f"Error: {e}")
+    return valueRange[0] <= value < valueRange[1]
         

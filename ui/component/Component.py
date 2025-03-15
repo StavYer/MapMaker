@@ -9,6 +9,7 @@ from pygame.rect import Rect
 from ui.theme.Theme import Theme
 from core.Listenable import Listenable
 from core.constants import UnitClass
+from ..Mouse import Mouse
 from ui.component.IComponentListener import IComponentListener
 
 class Component(Listenable[IComponentListener]):

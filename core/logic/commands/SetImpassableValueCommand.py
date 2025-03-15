@@ -59,7 +59,7 @@ class SetImpassableValueCommand(SetLayerValueCommand):
         # If fill is enabled, recursively add commands for adjacent cells
         if self._fill:
             x, y = coords[0], coords[1]
-            i_logic.addCommand(SetImpassableValueCommand((x + 1, y), self._unit, value, True))
-            i_logic.addCommand(SetImpassableValueCommand((x - 1, y), self._unit, value, True))
-            i_logic.addCommand(SetImpassableValueCommand((x, y + 1), self._unit, value, True))
-            i_logic.addCommand(SetImpassableValueCommand((x, y - 1), self._unit, value, True))
+            i_logic.addCommand(SetImpassableValueCommand((x + 1, y), value, self._unit, True))
+            i_logic.addCommand(SetImpassableValueCommand((x - 1, y), value, self._unit, True))
+            i_logic.addCommand(SetImpassableValueCommand((x, y + 1), value, self._unit, True))
+            i_logic.addCommand(SetImpassableValueCommand((x, y - 1), value, self._unit, True))
