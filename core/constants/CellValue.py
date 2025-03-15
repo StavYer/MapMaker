@@ -21,6 +21,8 @@ class CellValue(IntEnum):
     OBJECTS_CAMP = 309
     OBJECTS_FARM = 310
 
+    UNITS_UNIT = 401
+
     MAX_VALUE = 1000
 
 CellValueRanges = {

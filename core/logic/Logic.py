@@ -7,6 +7,7 @@ from ..state import World
 from .commands.SetGroundValueCommand import SetGroundValueCommand
 from .commands.SetImpassableValueCommand import SetImpassableValueCommand
 from .commands.SetObjectsValueCommand import SetObjectsValueCommand
+from .commands.SetUnitsCellCommand import SetUnitsCellCommand
 
 
 class Logic:
@@ -41,6 +42,7 @@ class Logic:
             "ground": SetGroundValueCommand,
             "impassable": SetImpassableValueCommand,
             "objects": SetObjectsValueCommand,
+            "units": SetUnitsCellCommand
         }
         
         return setLayerValueCommand[i_layer]

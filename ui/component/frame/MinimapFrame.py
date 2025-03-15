@@ -24,9 +24,11 @@ class MinimapFrame(FrameComponent, ILayerListener):
 
         # Initialize colors for each cell value range
         self.__colors = {}
-        for name, valueRange in CellValueRanges.items():
+        for name in ["ground", "impassable", "objects"]:
             tileset = i_theme.getTileset(name)
+            valueRange = CellValueRanges[name]
             self.__colors[name] = tileset.getTilesColor(valueRange)
+
 
         # Register as a listener for each layer in the world
         for layer in self.__world.layers:
@@ -43,35 +45,41 @@ class MinimapFrame(FrameComponent, ILayerListener):
             reversed(self.__world.layerNames),
             reversed(self.__world.layers)
         )
-        minimapArray: Optional[np.ndarray] = None
         if self.__minimapSurface is None or cellsBox is None:
-            for name, layer in layers:
-                colorMap = self.__colors[name]
-                colors = colorMap[layer.cells]
-                if minimapArray is None:
-                    minimapArray = colors
-                else:
-                    transparent = minimapArray[..., 3] == 0
-                    minimapArray[transparent] = colors[transparent]
-
-            if minimapArray is not None:
-                surface = pygame.surfarray.make_surface(minimapArray[..., 0:3])
-                self.__minimapSurface = cast(Surface, surface.convert_alpha())
+            cellMinX, cellMaxX = 0, self.__world.width
+            cellMinY, cellMaxY = 0, self.__world.height
         else:
             cellMinX, cellMaxX, cellMinY, cellMaxY = cellsBox
-            cellsSlice = np.s_[cellMinX:cellMaxX, cellMinY:cellMaxY]
-            for name, layer in layers:
+        cellsSlice = np.s_[cellMinX:cellMaxX, cellMinY:cellMaxY]
+        minimapArray = np.zeros(
+            [cellMaxX - cellMinX, cellMaxY - cellMinY, 4],
+            dtype=np.int32
+        )
+
+        for name, layer in layers:
+            cells = layer.cells[cellsSlice]
+            if name == "units":
+                playerColors = self.theme.playerColors
+                validCells = cells == CellValue.UNITS_UNIT
+                cellCoords = np.transpose(np.nonzero(validCells))
+                for cell in cellCoords:
+                    cellX = int(cellMinX + cell[0])
+                    cellY = int(cellMinY + cell[1])
+                    unit = layer.getUnit((cellX, cellY))
+                    if unit is not None:
+                        color = playerColors[unit.playerId]
+                        minimapArray[cell[0], cell[1], :] = color
+            else:
                 colorMap = self.__colors[name]
-                cells = layer.cells[cellsSlice]
                 colors = colorMap[cells]
-                if minimapArray is None:
-                    minimapArray = colors
-                else:
-                    transparent = minimapArray[..., 3] == 0
-                    minimapArray[transparent] = colors[transparent]
-            if minimapArray is not None:
-                minimapArea = pygame.surfarray.make_surface(minimapArray[..., 0:3]).convert_alpha()
-                self.__minimapSurface.blit(minimapArea, (cellMinX, cellMinY))
+                transparent = minimapArray[..., 3] == 0
+                minimapArray[transparent] = colors[transparent]
+
+        minimapArea = pygame.surfarray.make_surface(minimapArray[..., 0:3]).convert()
+        if self.__minimapSurface is None:
+            self.__minimapSurface = minimapArea
+        else:
+            self.__minimapSurface.blit(minimapArea, (cellMinX, cellMinY))
 
     def render(self, i_surface: Surface):
         super().render(i_surface)
