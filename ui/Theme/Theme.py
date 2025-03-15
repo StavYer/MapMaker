@@ -4,7 +4,7 @@ like the size of tiles or the used tilesets.
 """
 
 import os
-from typing import Dict, Tuple, Union, Optional
+from typing import Dict, Tuple, Union, Optional, List
 
 import numpy as np
 import pygame
@@ -12,7 +12,7 @@ from pygame.color import Color
 from pygame.font import Font
 from pygame.surface import Surface
 
-from core.constants import CellValue
+from core.constants import CellValue, UnitClass
 from .Tileset import Tileset
 
 
@@ -30,6 +30,14 @@ class Theme:
 
         # Set the frame border size based on the tile size of the "frame" tileset.
         self.__frameBorderSize = self.__tilesets["frame"].tileSize[0]
+
+        self.__playerColors = [
+            (128, 128, 128, 255),
+            (  0,   0, 255, 255),
+            (255,   0,   0, 255),
+            (255, 255,   0, 255),
+            (  64,255,  64, 255),
+        ]
 
         self.__fontsDef = {
             "default": {
@@ -59,6 +67,10 @@ class Theme:
         # Return the size of the frame border.
         return self.__frameBorderSize
 
+    @property
+    def playerColors(self) -> List[Tuple[int, int, int, int]]:
+        return self.__playerColors
+    
     @property
     def viewSize(self) -> Tuple[int, int]:
         # Return the current view size.
@@ -207,6 +219,22 @@ tilesDefs = {
         "wood": (2, 0),
         "stone": (3, 0),
     },
+    },
+    "units":{
+        "imageFile": "toen/units.png",
+    "tileSize": (16, 16),
+    "tiles": {
+        UnitClass.NONE: [(0, 0)],
+        UnitClass.WORKER: [(0, 1), (0, 2), (0, 3), (0, 4), (0, 5)],
+        UnitClass.FARMER: [(2, 1), (2, 2), (2, 3), (2, 4), (2, 5)],
+        UnitClass.BOWMAN: [(4, 1), (4, 2), (4, 3), (4, 4), (4, 5)],
+        UnitClass.PIKEMAN: [(5, 1), (5, 2), (5, 3), (5, 4), (5, 5)],
+        UnitClass.SWORDSMAN: [(6, 1), (6, 2), (6, 3), (6, 4), (6, 5)],
+        UnitClass.KNIGHT: [(7, 1), (7, 2), (7, 3), (7, 4), (7, 5)],
+        UnitClass.CATAPULT: [(8, 1), (8, 2), (8, 3), (8, 4), (8, 5)],
+    },
     }
+    
+    
 }
 

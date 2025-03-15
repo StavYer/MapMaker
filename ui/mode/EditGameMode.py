@@ -1,10 +1,10 @@
 import random
 import pygame
-from typing import Tuple, Union
+from typing import Tuple, Union, Optional
 
 
-from core.constants import CellValue, CellValueRanges
-from core.state import World
+from core.constants import CellValue, CellValueRanges, UnitClass
+from core.state import World, Unit, GameState
 from core.logic import Logic
 from tools.vector import vectorMulI, vectorSubI, vectorClampI
 from ..Mouse import Mouse
@@ -20,24 +20,25 @@ from ..component.frame.PaletteFrame import PaletteFrame
 class EditGameMode(GameMode, IComponentListener):
     """Game mode for editing the world"""
 
-    def __init__(self, i_theme: Theme, i_world: World):
+    def __init__(self, i_theme: Theme, i_state: GameState):
         super().__init__(i_theme)
-        self.__world = i_world
-        self.__logic = Logic(i_world)
+        self.__state = i_state
+        self.__world = i_state.world
+        self.__logic = Logic(self.__world)
         self.__font = i_theme.getFont("default")
 
         # Create world component
-        self.__worldComponent = WorldComponent(i_theme, i_world)
+        self.__worldComponent = WorldComponent(i_theme, self.__world)
 
         # Create resources frame
         self.__resourcesFrame = ResourcesFrame(i_theme)
         self.__resourcesFrame.moveRelativeTo("topLeft", self, "topLeft")
         
         # Create palette and minimap frame
-        self.__paletteFrame = PaletteFrame(i_theme, i_world)
+        self.__paletteFrame = PaletteFrame(i_theme, self.__state)
         self.__paletteFrame.moveRelativeTo("bottom", self, "bottom")
 
-        self.__minimapFrame = MinimapFrame(i_theme, i_world)
+        self.__minimapFrame = MinimapFrame(i_theme, self.__world)
         self.__minimapFrame.moveRelativeTo("bottomRight", self, "bottomRight")
 
         # Add components in order (world first, palette on top)
@@ -51,6 +52,8 @@ class EditGameMode(GameMode, IComponentListener):
         self.__mainBrushValue = CellValue.GROUND_EARTH
         self.__secondaryBrushLayer = "ground"
         self.__secondaryBrushValue :Union[int, str] = CellValue.GROUND_SEA
+        self.__mainBrushUnitClass: Optional[UnitClass] = None
+        self.__secondaryBrushUnitClass: Optional[UnitClass] = None
 
         # Register as listener
         self.__worldComponent.registerListener(self)
@@ -88,18 +91,23 @@ class EditGameMode(GameMode, IComponentListener):
             # Add cell value
             brushLayer = self.__mainBrushLayer
             brushValue = self.__mainBrushValue
+            brushUnitClass = self.__mainBrushUnitClass
             fill = i_mouse.button2
         elif i_mouse.button3:
             # Remove cell value
             brushLayer = self.__secondaryBrushLayer
             brushValue = self.__secondaryBrushValue
+            brushUnitClass = self.__secondaryBrushUnitClass
             fill = False
         else:
             return
 
         # Create and add command
         Command = self.__logic.getSetLayerValueCommand(brushLayer)
-        command = Command(i_cell, brushValue, fill)
+        brushUnit = None
+        if brushUnitClass is not None:
+            brushUnit = Unit(brushUnitClass, self.__state.currentPlayerId)
+        command = Command(i_cell, brushValue, brushUnit, fill)
         self.__logic.addCommand(command)
 
     def worldCellClicked(self, i_cell: Tuple[int, int], i_mouse: Mouse):
@@ -111,15 +119,17 @@ class EditGameMode(GameMode, IComponentListener):
         if i_dragging:
             self.__updateCell(i_cell, i_mouse)
             
-    def mainBrushSelected(self, i_layerName: str, i_value: Union[int, str]):
+    def mainBrushSelected(self, i_layerName: str, i_value: Union[int, str], i_unitClass: Optional[UnitClass] = None):
         """Called when the main brush is selected from palette"""
         self.__mainBrushLayer = i_layerName
         self.__mainBrushValue = i_value
+        self.__mainBrushUnitClass = i_unitClass
         
-    def secondaryBrushSelected(self, i_layerName: str, i_value: Union[int, str]):
+    def secondaryBrushSelected(self, i_layerName: str, i_value: Union[int, str], i_unitClass: Optional[UnitClass] = None):
         """Called when the secondary brush is selected from palette"""
         self.__secondaryBrushLayer = i_layerName
         self.__secondaryBrushValue = i_value
+        self.__secondaryBrushUnitClass = i_unitClass
 
     def processInput(self) -> bool:
         """Process keyboard input for view movement"""
@@ -149,4 +159,4 @@ class EditGameMode(GameMode, IComponentListener):
             return True
         return False
 
-  
+

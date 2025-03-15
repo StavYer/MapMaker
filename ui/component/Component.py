@@ -8,6 +8,7 @@ from pygame.rect import Rect
 
 from ui.theme.Theme import Theme
 from core.Listenable import Listenable
+from core.constants import UnitClass
 from ui.component.IComponentListener import IComponentListener
 
 class Component(Listenable[IComponentListener]):
@@ -205,15 +206,15 @@ class Component(Listenable[IComponentListener]):
         for listener in self.listeners:
             listener.worldCellEntered(i_cell, i_mouse, i_dragging)
             
-    def notifyMainBrushSelected(self, i_layerName: str, i_value: Union(int, str)) -> None:
+    def notifyMainBrushSelected(self, i_layerName: str, i_value: Union[int, str], i_unitClass: Optional[UnitClass]) -> None:
         """Notify all listeners that the main brush was selected."""
         for listener in self.listeners:
-            listener.mainBrushSelected(i_layerName, i_value)
+            listener.mainBrushSelected(i_layerName, i_value, i_unitClass)
             
-    def notifySecondaryBrushSelected(self, i_layerName: str, i_value: Union(int, str)) -> None:
+    def notifySecondaryBrushSelected(self, i_layerName: str, i_value: Union[int, str],  i_unitClass: Optional[UnitClass]) -> None:
         """Notify all listeners that the secondary brush was selected."""
         for listener in self.listeners:
-            listener.secondaryBrushSelected(i_layerName, i_value)
+            listener.secondaryBrushSelected(i_layerName, i_value, i_unitClass)
 
     def notifyViewChanged(self, i_view: tuple[int, int]) -> None:
         """Notify all listeners that the view position has changed."""

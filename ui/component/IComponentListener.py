@@ -1,29 +1,31 @@
 # ui/IComponentListener.py
+from __future__ import annotations
 from abc import ABC
-from typing import Tuple, Union, TYPE_CHECKING
+from typing import Tuple, Union, Optional, TYPE_CHECKING
+from core.constants import UnitClass
 
 if TYPE_CHECKING:
     from ui.Mouse import Mouse
 
 class IComponentListener(ABC):
-    """Interface for objects that want to receive notifications about component events."""
+    """Interface for components that listen to world events"""
     
-    def worldCellClicked(self, i_cell: Tuple[int, int], i_mouse: 'Mouse') -> None:
-        """Called when a cell in the world is clicked."""
+    def worldCellClicked(self, cell: Tuple[int, int], mouse: Mouse):
+        """Called when a cell in the world is clicked"""
+        pass
+
+    def worldCellEntered(self, cell: Tuple[int, int], mouse: Mouse, dragging: bool):
+        """Called when the mouse enters a cell in the world"""
         pass
     
-    def worldCellEntered(self, i_cell: Tuple[int, int], i_mouse: 'Mouse', i_dragging: bool) -> None:
-        """Called when mouse enters a cell in the world."""
+    def mainBrushSelected(self, layerName: str, value: Union[int, str], unitClass: Optional[UnitClass] = None):
+        """Called when the main brush is selected"""
         pass
         
-    def mainBrushSelected(self, i_layerName: str, i_value: Union[int, str]) -> None:
-        """Called when the main brush is selected."""
+    def secondaryBrushSelected(self, layerName: str, value: Union[int, str], unitClass: Optional[UnitClass] = None):
+        """Called when the secondary brush is selected"""
         pass
         
-    def secondaryBrushSelected(self, i_layerName: str, i_value: Union[int, str]) -> None:
-        """Called when the secondary brush is selected."""
-        pass
-        
-    def viewChanged(self, i_view: Tuple[int, int]) -> None:
-        """Called when the view position changes."""
+    def viewChanged(self, view: Tuple[int, int]):
+        """Called when the view changes"""
         pass
