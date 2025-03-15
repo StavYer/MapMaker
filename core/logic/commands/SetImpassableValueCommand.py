@@ -15,6 +15,9 @@ class SetImpassableValueCommand(SetLayerValueCommand):
         # Verify if the value to set is a valid impassable cell value
         if not checkCellValue("impassable", value):
             return False
+        
+        if self._unit is not None:
+            return False
 
         coords = self._coords
         world = i_logic.world
@@ -56,7 +59,7 @@ class SetImpassableValueCommand(SetLayerValueCommand):
         # If fill is enabled, recursively add commands for adjacent cells
         if self._fill:
             x, y = coords[0], coords[1]
-            i_logic.addCommand(SetImpassableValueCommand((x + 1, y), value, True))
-            i_logic.addCommand(SetImpassableValueCommand((x - 1, y), value, True))
-            i_logic.addCommand(SetImpassableValueCommand((x, y + 1), value, True))
-            i_logic.addCommand(SetImpassableValueCommand((x, y - 1), value, True))
+            i_logic.addCommand(SetImpassableValueCommand((x + 1, y), self._unit, value, True))
+            i_logic.addCommand(SetImpassableValueCommand((x - 1, y), self._unit, value, True))
+            i_logic.addCommand(SetImpassableValueCommand((x, y + 1), self._unit, value, True))
+            i_logic.addCommand(SetImpassableValueCommand((x, y - 1), self._unit, value, True))

@@ -1,7 +1,7 @@
 import numpy as np
 from pygame import Surface
 
-from core.constants import CellValue, Direction, directions
+from core.constants import CellValue, Direction
 from core.state import World
 from tools.tilecodes import code4np
 from .LayerComponent import LayerComponent

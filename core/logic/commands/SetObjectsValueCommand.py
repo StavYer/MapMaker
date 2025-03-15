@@ -14,6 +14,9 @@ class SetObjectsValueCommand(SetLayerValueCommand):
         # Validate the cell value for objects
         if not checkCellValue("objects", value):
             return False
+        
+        if self._unit is not None:
+            return False
 
         coords = self._coords
         world = i_logic.world
@@ -69,7 +72,7 @@ class SetObjectsValueCommand(SetLayerValueCommand):
         # If fill is enabled, recursively add commands for adjacent cells
         if hasattr(self, '_fill') and self._fill:
             x, y = coords[0], coords[1]
-            i_logic.addCommand(SetObjectsValueCommand((x + 1, y), value, True))
-            i_logic.addCommand(SetObjectsValueCommand((x - 1, y), value, True))
-            i_logic.addCommand(SetObjectsValueCommand((x, y + 1), value, True))
-            i_logic.addCommand(SetObjectsValueCommand((x, y - 1), value, True))
+            i_logic.addCommand(SetObjectsValueCommand((x + 1, y), self._unit, value, True))
+            i_logic.addCommand(SetObjectsValueCommand((x - 1, y), self._unit, value, True))
+            i_logic.addCommand(SetObjectsValueCommand((x, y + 1), self._unit, value, True))
+            i_logic.addCommand(SetObjectsValueCommand((x, y - 1), self._unit, value, True))

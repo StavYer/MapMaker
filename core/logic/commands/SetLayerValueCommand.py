@@ -1,15 +1,17 @@
 from __future__ import annotations
 
-from typing import Tuple, TYPE_CHECKING
+from typing import Tuple, Optional
 
 from core.constants import CellValue
 from ..Command import Command, WORLD_PRIORITY, WORLD_MAX_WIDTH
+from ...state import Unit
 
 
 class SetLayerValueCommand(Command):
-    def __init__(self, i_coords: Tuple[int, int], i_value: CellValue, i_fill: bool = False):
+    def __init__(self, i_coords: Tuple[int, int], i_value: CellValue,i_unit: Optional[Unit] = None, i_fill: bool = False):
         self._coords = i_coords
         self._value = i_value
+        self._unit = i_unit
         self._fill = i_fill
 
     def priority(self) -> int:
